@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07131f">
+    <title>IT3385 Team 5 · Machine Learning Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+</head>
+<body>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="aurora aurora-one" aria-hidden="true"></div>
+    <div class="aurora aurora-two" aria-hidden="true"></div>
+
+    <main class="portal-shell">
+        <nav class="portal-nav" aria-label="Team project navigation">
+            <a class="portal-brand" href="{{ url_for('home') }}" aria-label="IT3385 Team 5 home">
+                <span class="brand-mark">T5</span>
+                <span class="brand-copy">
+                    <strong>IT3385 · Team 5</strong>
+                    <small>Integrated Machine Learning Application</small>
+                </span>
+            </a>
+            <span class="nav-pill"><i></i> Team portal online</span>
+        </nav>
+
+        <header class="portal-hero">
+            <div class="hero-copy">
+                <span class="eyebrow">One portal · Independent ML pipelines</span>
+                <h1>Three projects.<br><span>One seamless experience.</span></h1>
+                <p>
+                    Each team member can work with a different dataset and trained model,
+                    while the final submission stays connected through one clear web application.
+                    Choose a project below to explore its prediction workflow.
+                </p>
+                <div class="hero-metrics" aria-label="Portal highlights">
+                    <div><strong>3</strong><span>team members</span></div>
+                    <div><strong>3</strong><span>dedicated project routes</span></div>
+                    <div><strong>1</strong><span>shared entry point</span></div>
+                </div>
+            </div>
+
+            <aside class="integration-card" aria-label="Application architecture summary">
+                <div class="integration-top">
+                    <span class="integration-icon">ML</span>
+                    <span class="live-badge"><i></i> Integrated</span>
+                </div>
+                <h2>Built to keep projects independent — without feeling separate.</h2>
+                <p>Every project owns its data and model pipeline. The portal simply brings them together under one navigation experience.</p>
+                <div class="flow-line" aria-hidden="true">
+                    <span>Dataset</span><b>→</b><span>Model</span><b>→</b><span>Prediction</span>
+                </div>
+            </aside>
+        </header>
+
+        <section class="project-section" aria-labelledby="projects-title">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Team projects</span>
+                    <h2 id="projects-title">Pick a project to continue.</h2>
+                </div>
+                <p>Kang Bin's predictor is live now. Clifton and Long Chen can connect their own datasets and apps to their existing routes.</p>
+            </div>
+
+            <div class="member-grid">
+                {% for member in members %}
+                <a class="member-card {% if member.active %}active{% endif %}" href="{{ member.href }}">
+                    <div class="card-glow" aria-hidden="true"></div>
+                    <div class="card-top">
+                        <span class="avatar">{{ member.initials }}</span>
+                        <span class="status {% if member.active %}status-live{% endif %}">
+                            {% if member.active %}<i></i>{% endif %}{{ member.status }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <span class="member-name">{{ member.name }}</span>
+                        <h3>{{ member.title }}</h3>
+                        <p>{{ member.description }}</p>
+                    </div>
+
+                    <div class="dataset-line">
+                        <span>Dataset</span>
+                        <strong>{{ member.dataset }}</strong>
+                    </div>
+
+                    <div class="capability-row">
+                        {% for capability in member.capabilities %}
+                        <span>{{ capability }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="card-link">
+                        <span>{% if member.active %}Open live project{% else %}Open project page{% endif %}</span>
+                        <b>↗</b>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer class="portal-footer">
+            <span>IT3385 Team 5</span>
+            <span>Independent datasets · shared application · real-time ML predictions</span>
+        </footer>
+    </main>
+</body>
+</html>

@@ -1,0 +1,22 @@
+hydra:
+  output_subdir: null  
+  run:
+    dir: .
+
+defaults:
+  - process: process1
+  - model: model1
+  - _self_
+
+data:
+  raw: data/raw/sample.csv
+  processed: data/processed/processed.csv
+  final: data/final/final.csv
+
+# Integrated Flask application configuration
+server:
+  host: "127.0.0.1"
+  port: 5000
+  use_reloader: false
+  use_debugger: false
+  threaded: true

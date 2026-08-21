@@ -1,0 +1,8 @@
+# Required packages for the Flask web application and saved PyCaret model.
+# Recommended: use the same Python environment/version used to train the model.
+Flask==3.0.3
+pycaret==3.3.2
+pandas==2.1.4
+numpy==1.26.4
+scikit-learn==1.4.2
+category-encoders==2.6.3

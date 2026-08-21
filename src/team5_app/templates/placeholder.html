@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07131f">
+    <title>{{ member_name }} · IT3385 Team 5</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+</head>
+<body class="placeholder-page">
+    <div class="noise" aria-hidden="true"></div>
+    <div class="aurora aurora-one" aria-hidden="true"></div>
+    <main class="portal-shell">
+        <nav class="portal-nav">
+            <a class="portal-brand" href="{{ url_for('home') }}">
+                <span class="brand-mark">T5</span>
+                <span class="brand-copy"><strong>IT3385 · Team 5</strong><small>Integrated Machine Learning Application</small></span>
+            </a>
+        </nav>
+
+        <section class="placeholder-card">
+            <span class="placeholder-avatar">{{ initials }}</span>
+            <span class="eyebrow">Project route ready</span>
+            <h1>{{ member_name }}'s project will live here.</h1>
+            <p>{{ message }}</p>
+            <div class="placeholder-flow"><span>Own dataset</span><b>+</b><span>Own model</span><b>+</b><span>Shared portal</span></div>
+            <a class="portal-button" href="{{ url_for('home') }}">← Back to Team 5</a>
+        </section>
+    </main>
+</body>
+</html>

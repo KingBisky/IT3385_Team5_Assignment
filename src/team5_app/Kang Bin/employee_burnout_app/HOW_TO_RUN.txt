@@ -1,0 +1,47 @@
+KANG BIN - EMPLOYEE BURNOUT PREDICTOR
+=====================================
+
+RECOMMENDED: RUN THROUGH THE TEAM PORTAL
+----------------------------------------
+From the IT3385_Team5 folder:
+
+    python app.py
+
+Then open:
+
+    http://127.0.0.1:5000/kang-bin/
+
+The Team Home button returns to:
+
+    http://127.0.0.1:5000/
+
+SINGLE PREDICTION
+-----------------
+Use the Single Prediction section, edit the employee profile and click
+"Predict burnout risk". Numeric ranges and categorical options are shown under
+every input and are validated again by Flask before the model is called.
+
+BATCH CSV PREDICTION
+--------------------
+1. Scroll to Batch Prediction.
+2. Click "Download CSV template" if you need the correct headers.
+3. Add one employee record per row.
+4. Upload the CSV and click "Run batch prediction".
+5. Review the prediction summary/preview.
+6. Click "Download all results" for the complete output CSV.
+
+The batch upload expects the same 23 predictors as the single form. Additional
+columns are allowed and will be preserved in the output. This means the original
+coursework dataset can be uploaded directly even though it includes the target
+and burnout_score columns; those extra fields are not supplied to the model.
+
+The upload limit is 32 MB. CSV files exported with a UTF-8 BOM are supported.
+Binary fields accept 0/1 and common Yes/No representations in batch files.
+
+DIRECT APP RUN (OPTIONAL)
+-------------------------
+You can also run this app directly from this folder with:
+
+    python app.py
+
+However, for the integrated Team 5 submission, use the root IT3385_Team5/app.py.

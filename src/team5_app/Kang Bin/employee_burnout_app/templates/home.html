@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#071925">
+    <title>Employee Burnout Predictor · Kang Bin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-grid" aria-hidden="true"></div>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <div class="page-shell">
+        <nav class="topbar" aria-label="Project navigation">
+            <a class="brand" href="{{ url_for('home') }}">
+                <span class="brand-mark">KB</span>
+                <span class="brand-copy">
+                    <strong>Employee Burnout Predictor</strong>
+                    <small>Kang Bin · IT3385 Team 5</small>
+                </span>
+            </a>
+
+            <div class="nav-actions">
+                <a href="#single-prediction">Single</a>
+                <a href="#batch-prediction">Batch CSV</a>
+                <a class="team-home" href="{{ url_for('team_home') }}">Team Home <span>↗</span></a>
+            </div>
+        </nav>
+
+        <header class="hero">
+            <div class="hero-copy">
+                <span class="eyebrow light">Machine Learning · Employee Wellbeing</span>
+                <h1>See the patterns behind <span>burnout risk.</span></h1>
+                <p>
+                    Use the trained classification model to estimate whether an employee profile
+                    is more consistent with <strong>Low</strong>, <strong>Moderate</strong> or
+                    <strong>High</strong> burnout risk. Test one profile or process an entire CSV in one go.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="hero-button primary" href="#single-prediction">Try one profile <span>↓</span></a>
+                    <a class="hero-button secondary" href="#batch-prediction">Upload a CSV</a>
+                </div>
+
+                <div class="hero-meta" aria-label="Application capabilities">
+                    <div><strong>{{ factor_count }}</strong><span>validated model inputs</span></div>
+                    <div><strong>3</strong><span>burnout classes</span></div>
+                    <div><strong>2</strong><span>prediction modes</span></div>
+                </div>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                <div class="visual-orbit orbit-one"></div>
+                <div class="visual-orbit orbit-two"></div>
+                <img src="{{ url_for('static', filename='images/hero-burnout.svg') }}" alt="">
+                <div class="model-status">
+                    <span class="status-dot"></span>
+                    <div>
+                        <strong>Model ready</strong>
+                        <small>PyCaret pipeline loaded locally</small>
+                    </div>
+                </div>
+                <div class="live-card live-card-one"><span>Single</span><strong>Instant result</strong></div>
+                <div class="live-card live-card-two"><span>Batch</span><strong>CSV → predictions</strong></div>
+            </div>
+        </header>
+
+        <section class="mode-strip" aria-label="Prediction modes">
+            <div class="mode-intro">
+                <span class="eyebrow">Choose how you want to predict</span>
+                <h2>One model, two practical workflows.</h2>
+            </div>
+            <a href="#single-prediction" class="mode-card">
+                <span class="mode-number">01</span>
+                <div><strong>Single profile</strong><small>Fine-tune each input and get one result immediately.</small></div>
+                <b>→</b>
+            </a>
+            <a href="#batch-prediction" class="mode-card">
+                <span class="mode-number">02</span>
+                <div><strong>Batch CSV</strong><small>Upload many records and download all predictions.</small></div>
+                <b>→</b>
+            </a>
+        </section>
+
+        <section class="section-anchor" id="single-prediction">
+            <div class="section-title-row">
+                <div>
+                    <span class="eyebrow">Single prediction</span>
+                    <h2>Build one employee profile.</h2>
+                </div>
+                <p>Every field is checked against the values used by the trained model before a prediction is made.</p>
+            </div>
+        </section>
+
+        {% if prediction %}
+        <section class="result-card result-{{ prediction.label|lower }}" id="prediction-result" aria-live="polite">
+            <div class="result-symbol">
+                {% if prediction.label == 'Low' %}✓{% elif prediction.label == 'Moderate' %}!{% else %}↑{% endif %}
+            </div>
+            <div class="result-copy">
+                <span class="result-kicker">Prediction complete</span>
+                <h2>{{ prediction.label }} burnout risk</h2>
+                <p>Predicted class {{ prediction.class }}. This is a machine-learning coursework result, not a clinical assessment.</p>
+            </div>
+            {% if prediction.confidence is not none %}
+            <div class="confidence-box">
+                <span>Model confidence</span>
+                <strong>{{ '%.1f'|format(prediction.confidence * 100) }}%</strong>
+                <div class="confidence-track" aria-hidden="true">
+                    <div class="confidence-fill" style="width: {{ '%.1f'|format(prediction.confidence * 100) }}%"></div>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        {% if error %}
+        <section class="server-error" id="server-error" aria-live="assertive">
+            <span class="error-icon">!</span>
+            <div><strong>One value needs attention.</strong><span>{{ error }}</span></div>
+        </section>
+        {% endif %}
+
+        <div class="validation-summary" id="validation-summary" role="alert" aria-live="assertive" hidden>
+            <strong>Some values need attention.</strong>
+            <span id="validation-summary-text">Please correct the highlighted fields before predicting.</span>
+        </div>
+
+        <form action="{{ url_for('predict') }}" method="POST" id="prediction-form" novalidate>
+            {% for section in form_sections %}
+            <section class="form-card">
+                <div class="section-heading">
+                    <div class="section-copy">
+                        <span class="section-kicker">{{ section.kicker }}</span>
+                        <h2>{{ section.title }}</h2>
+                        <p>{{ section.description }}</p>
+                    </div>
+                    <div class="section-visual" aria-hidden="true">
+                        <img src="{{ url_for('static', filename=section.image) }}" alt="">
+                    </div>
+                </div>
+
+                <div class="field-grid">
+                    {% for field in section.fields %}
+                    <div class="field" data-field-wrapper="{{ field.name }}">
+                        <div class="label-row">
+                            <label for="{{ field.name }}">{{ field.label }}</label>
+                            {% if field.type == 'number' %}
+                            {% set spec = numeric_specs[field.name] %}
+                            <span class="range-badge">{{ spec.min }} – {{ spec.max }}</span>
+                            {% endif %}
+                        </div>
+
+                        {% if field.type == 'select' %}
+                        <div class="control-wrap control-select">
+                            <select id="{{ field.name }}" name="{{ field.name }}" required>
+                                {% for option in category_options[field.name] %}
+                                <option value="{{ option }}" {% if form_values[field.name]|string == option|string %}selected{% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <small class="hint"><span>Allowed</span><b>{{ category_options[field.name]|join(' · ') }}</b></small>
+
+                        {% elif field.type == 'binary_select' %}
+                        <div class="control-wrap control-select">
+                            <select id="{{ field.name }}" name="{{ field.name }}" required>
+                                <option value="0" {% if form_values[field.name]|string == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_values[field.name]|string == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <small class="hint"><span>Allowed</span><b>No · Yes</b></small>
+
+                        {% else %}
+                        {% set spec = numeric_specs[field.name] %}
+                        <div class="control-wrap">
+                            <input
+                                id="{{ field.name }}"
+                                name="{{ field.name }}"
+                                type="number"
+                                value="{{ form_values[field.name] }}"
+                                min="{{ spec.min }}"
+                                max="{{ spec.max }}"
+                                step="{{ spec.step }}"
+                                data-kind="{{ spec.kind }}"
+                                required
+                            >
+                        </div>
+                        <small class="hint"><span>Allowed range</span><b>{{ spec.min }} to {{ spec.max }}</b></small>
+                        {% endif %}
+
+                        <small class="field-error" id="{{ field.name }}-error" aria-live="polite"></small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+
+            <div class="action-card">
+                <div class="action-copy">
+                    <span class="action-icon">ML</span>
+                    <div>
+                        <strong>Ready for a single prediction?</strong>
+                        <span>All {{ factor_count }} inputs will be passed through the saved preprocessing and classification pipeline.</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <a href="{{ url_for('home') }}#single-prediction" class="button button-secondary">Reset</a>
+                    <button type="submit" class="button button-primary" id="predict-button">
+                        <span class="button-text">Predict burnout risk</span><span class="button-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <section class="batch-section section-anchor" id="batch-prediction">
+            <div class="batch-header">
+                <div>
+                    <span class="eyebrow light">Batch prediction</span>
+                    <h2>Turn a CSV into a prediction file.</h2>
+                    <p>
+                        Upload multiple employee records at once. The app validates the same {{ factor_count }} model inputs,
+                        predicts every row in real time and keeps your original columns in the downloadable result.
+                    </p>
+                </div>
+                <div class="batch-badge"><span>CSV</span><strong>Single upload → many predictions</strong></div>
+            </div>
+
+            <div class="batch-layout">
+                <div class="upload-panel">
+                    <form action="{{ url_for('batch_predict') }}" method="POST" enctype="multipart/form-data" id="batch-form">
+                        <label class="dropzone" for="batch_file" id="dropzone">
+                            <input id="batch_file" name="batch_file" type="file" accept=".csv,text/csv" required>
+                            <span class="upload-icon" aria-hidden="true">↑</span>
+                            <strong>Drop your CSV here</strong>
+                            <span>or click to choose a file from your computer</span>
+                            <small>CSV only · up to {{ max_upload_mb }} MB · extra columns are okay</small>
+                            <b id="selected-file">No file selected</b>
+                        </label>
+
+                        <div class="batch-actions">
+                            <a class="button button-dark-secondary" href="{{ url_for('batch_template') }}">Download CSV template</a>
+                            <button type="submit" class="button button-batch" id="batch-button">
+                                <span class="button-text">Run batch prediction</span><span>→</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if batch_error %}
+                    <div class="batch-error" id="batch-error" role="alert">
+                        <div class="batch-error-title"><span>!</span><strong>We couldn't process that CSV.</strong></div>
+                        <ul>
+                            {% for message in batch_error %}<li>{{ message }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <aside class="batch-guide">
+                    <span class="guide-kicker">Before you upload</span>
+                    <h3>Keep the headers, change the rows.</h3>
+                    <ol>
+                        <li><span>1</span><div><strong>Start with the template</strong><small>It already contains every feature name expected by the model.</small></div></li>
+                        <li><span>2</span><div><strong>Add as many records as you need</strong><small>The full coursework dataset is supported; unrelated extra columns can stay.</small></div></li>
+                        <li><span>3</span><div><strong>Download the result</strong><small>Predicted class, risk level and confidence are appended to the CSV.</small></div></li>
+                    </ol>
+
+                    <details class="column-details">
+                        <summary>View the {{ factor_count }} required columns <span>+</span></summary>
+                        <div class="column-cloud">
+                            {% for column in required_columns %}<code>{{ column }}</code>{% endfor %}
+                        </div>
+                    </details>
+                </aside>
+            </div>
+        </section>
+
+        {% if batch_result %}
+        <section class="batch-result" id="batch-result" aria-live="polite">
+            <div class="batch-result-head">
+                <div>
+                    <span class="eyebrow">Batch complete</span>
+                    <h2>{{ batch_result.rows }} rows predicted successfully.</h2>
+                    <p>{{ batch_result.filename }} was validated against the model schema before prediction.</p>
+                </div>
+                <a class="button button-primary" href="{{ url_for('download_batch_result', token=batch_result.download_token) }}">Download all results ↓</a>
+            </div>
+
+            <div class="batch-stats">
+                <div class="stat stat-low"><span>Low risk</span><strong>{{ batch_result.low }}</strong><small>predictions</small></div>
+                <div class="stat stat-moderate"><span>Moderate risk</span><strong>{{ batch_result.moderate }}</strong><small>predictions</small></div>
+                <div class="stat stat-high"><span>High risk</span><strong>{{ batch_result.high }}</strong><small>predictions</small></div>
+                <div class="stat stat-confidence"><span>Average confidence</span><strong>{% if batch_result.average_confidence is not none %}{{ '%.1f'|format(batch_result.average_confidence * 100) }}%{% else %}—{% endif %}</strong><small>across the batch</small></div>
+            </div>
+
+            <div class="preview-card">
+                <div class="preview-heading">
+                    <div><strong>Prediction preview</strong><span>Showing the first {{ batch_result.preview_limit }} rows at most</span></div>
+                    <span class="preview-pill">{{ batch_result.rows }} total rows</span>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr>{% for column in batch_result.preview_columns %}<th>{{ column|replace('_', ' ')|title }}</th>{% endfor %}</tr></thead>
+                        <tbody>
+                            {% for row in batch_result.preview_rows %}
+                            <tr>
+                                {% for column in batch_result.preview_columns %}
+                                <td>
+                                    {% if column == 'predicted_burnout_level' %}
+                                    <span class="risk-pill risk-{{ row[column]|lower }}">{{ row[column] }}</span>
+                                    {% else %}
+                                    {{ row[column] }}
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <footer class="footer-note">
+            <div><strong>IT3385 · Team 5</strong><span>Kang Bin — Employee Burnout Predictor</span></div>
+            <p>Predictions are generated by a trained machine-learning model for coursework demonstration and are not a medical diagnosis.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ---------- Single-prediction validation ----------
+        const form = document.getElementById('prediction-form');
+        const summary = document.getElementById('validation-summary');
+        const summaryText = document.getElementById('validation-summary-text');
+        const inputs = Array.from(form.querySelectorAll('input, select'));
+        const predictButton = document.getElementById('predict-button');
+
+        function labelFor(element) {
+            const label = form.querySelector(`label[for="${element.id}"]`);
+            return label ? label.textContent.trim() : element.name;
+        }
+
+        function validateField(element) {
+            const errorElement = document.getElementById(`${element.id}-error`);
+            const label = labelFor(element);
+            let message = '';
+
+            if (!String(element.value).trim()) {
+                message = `${label} is required.`;
+            } else if (element.type === 'number') {
+                const value = Number(element.value);
+                const min = Number(element.min);
+                const max = Number(element.max);
+                const kind = element.dataset.kind;
+                if (Number.isNaN(value)) message = `${label} must be a number.`;
+                else if (value < min || value > max) message = `${label} must be between ${element.min} and ${element.max}.`;
+                else if (kind === 'int' && !Number.isInteger(value)) message = `${label} must be a whole number.`;
+            }
+
+            element.classList.toggle('invalid', Boolean(message));
+            errorElement.textContent = message;
+            return message;
+        }
+
+        inputs.forEach((element) => {
+            element.addEventListener('input', () => validateField(element));
+            element.addEventListener('change', () => validateField(element));
+        });
+
+        form.addEventListener('submit', (event) => {
+            const messages = inputs.map(validateField).filter(Boolean);
+            if (messages.length) {
+                event.preventDefault();
+                summary.hidden = false;
+                summaryText.textContent = `${messages.length} field${messages.length === 1 ? '' : 's'} need attention. Check the highlighted values.`;
+                const firstInvalid = form.querySelector('.invalid');
+                if (firstInvalid) firstInvalid.focus();
+                summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            summary.hidden = true;
+            predictButton.classList.add('is-loading');
+            predictButton.disabled = true;
+            predictButton.querySelector('.button-text').textContent = 'Running model…';
+        });
+
+        // ---------- Batch upload interactions ----------
+        const batchForm = document.getElementById('batch-form');
+        const batchInput = document.getElementById('batch_file');
+        const dropzone = document.getElementById('dropzone');
+        const selectedFile = document.getElementById('selected-file');
+        const batchButton = document.getElementById('batch-button');
+
+        function showSelectedFile() {
+            if (batchInput.files.length) {
+                const file = batchInput.files[0];
+                selectedFile.textContent = `${file.name} · ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+                dropzone.classList.add('has-file');
+            } else {
+                selectedFile.textContent = 'No file selected';
+                dropzone.classList.remove('has-file');
+            }
+        }
+
+        batchInput.addEventListener('change', showSelectedFile);
+        ['dragenter', 'dragover'].forEach((eventName) => {
+            dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dropzone.classList.add('is-dragging');
+            });
+        });
+        ['dragleave', 'drop'].forEach((eventName) => {
+            dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dropzone.classList.remove('is-dragging');
+            });
+        });
+        dropzone.addEventListener('drop', (event) => {
+            const files = event.dataTransfer.files;
+            if (files.length) {
+                batchInput.files = files;
+                showSelectedFile();
+            }
+        });
+
+        batchForm.addEventListener('submit', (event) => {
+            if (!batchInput.files.length) {
+                event.preventDefault();
+                selectedFile.textContent = 'Please choose a CSV file first.';
+                dropzone.classList.add('upload-invalid');
+                return;
+            }
+            dropzone.classList.remove('upload-invalid');
+            batchButton.classList.add('is-loading');
+            batchButton.disabled = true;
+            batchButton.querySelector('.button-text').textContent = 'Predicting rows…';
+        });
+
+        // Bring server-side results/errors into view after a form POST.
+        const focusTarget = document.getElementById('prediction-result')
+            || document.getElementById('server-error')
+            || document.getElementById('batch-result')
+            || document.getElementById('batch-error');
+        if (focusTarget) {
+            window.requestAnimationFrame(() => focusTarget.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+        }
+    </script>
+</body>
+</html>
