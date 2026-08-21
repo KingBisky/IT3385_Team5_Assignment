@@ -168,18 +168,10 @@ git --version
 
 For collaborative development, use `git clone` instead of downloading the repository as a ZIP file.
 
+First, navigate to the directory where you want to store the project. For example, if you want to store it on your Desktop:
+
 ```bash
-git clone https://github.com/KingBisky/IT3385_Team5_Assignment.git
-cd IT3385_Team5_Assignment
-```
-
-Using `git clone` preserves:
-
-- Git history
-- branches
-- commits
-- push and pull functionality
-- Pull Request workflow
+cd Desktop
 
 ---
 
