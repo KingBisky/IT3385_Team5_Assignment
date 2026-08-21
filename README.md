@@ -4,18 +4,18 @@ This repository contains Team 5's Machine Learning Operations (MLOps) project fo
 
 The project provides a shared and reproducible development environment for developing, testing and integrating the team's machine learning web applications.
 
-The MLOps environment currently implements:
+The current MLOps environment implements:
 
-- Standard ML project structure
+- Standard ML project folder structure
 - Poetry dependency management
 - Hydra configuration management
 - DVC data version control
-- Git and GitHub source control
+- Git and GitHub source code version control
 - Feature branching
-- Pull Requests
+- Pull Request workflow
 - Pytest automated testing
 - GitHub Actions Continuous Integration (CI)
-- Flask web applications
+- Flask web application integration
 - PyCaret machine learning models
 
 ---
@@ -27,10 +27,12 @@ The MLOps environment currently implements:
 | Team Member | Dataset / Individual Work |
 |---|---|
 | Kang Bin | Employee Burnout Prediction – EDA, machine learning model, Flask prediction application and MLOps environment setup |
-| Clifton | Mental Health Risk Prediction – mental health risk dataset and machine learning component |
-| Long Chen | Global AI Jobs – global AI jobs dataset and machine learning component |
+| Clifton | Mental Health Risk Prediction – Mental Health Risk dataset and machine learning component |
+| Long Chen | Global AI Jobs – Global AI Jobs dataset and machine learning component |
 
-Each team member is responsible for an individual dataset and machine learning component before integration into the shared Team 5 web application.
+Each team member is responsible for an individual dataset and machine learning component.
+
+The individual ML applications will be integrated into the shared Team 5 Flask web application.
 
 ---
 
@@ -48,9 +50,7 @@ IT3385_Team5_Assignment/
 │       └── ci.yml
 │
 ├── config/
-│   ├── main.yaml
-│   ├── model/
-│   └── process/
+│   └── main.yaml
 │
 ├── data/
 │   ├── raw/
@@ -71,26 +71,25 @@ IT3385_Team5_Assignment/
 │
 ├── docs/
 │
-├── models/
-│
 ├── notebooks/
 │   └── Kang Bin/
 │       └── KangBin_Task1&2.ipynb
 │
 ├── src/
 │   ├── __init__.py
-│   ├── process.py
-│   ├── train_model.py
 │   │
 │   └── team5_app/
 │       ├── app.py
+│       │
 │       ├── static/
+│       │
 │       ├── templates/
 │       │
 │       ├── Kang Bin/
 │       │   └── employee_burnout_app/
 │       │       ├── app.py
 │       │       ├── employee_burnout_final_model.pkl
+│       │       ├── requirements.txt
 │       │       ├── static/
 │       │       └── templates/
 │       │
@@ -101,12 +100,13 @@ IT3385_Team5_Assignment/
 │   ├── __init__.py
 │   └── test_environment.py
 │
+├── .gitignore
 ├── poetry.lock
 ├── pyproject.toml
 └── README.md
 ```
 
-The project structure separates configuration, datasets, notebooks, models, source code and automated tests to support collaborative machine learning development.
+The project structure separates configuration, datasets, notebooks, application source code and automated tests to support collaborative machine learning development.
 
 ---
 
@@ -114,57 +114,49 @@ The project structure separates configuration, datasets, notebooks, models, sour
 
 | Tool | Purpose |
 |---|---|
-| Cookiecutter | Generated the standard ML project structure |
+| Cookiecutter | Generated the initial standard ML project structure |
 | Conda | Provides the base Python 3.10 interpreter |
-| Poetry | Dependency and virtual environment management |
-| Hydra | Configuration management and reduction of hard-coded settings |
-| DVC | Version control for machine learning datasets |
-| Git | Local source code version control |
-| GitHub | Shared source-code repository |
+| Poetry | Manages project dependencies and the project virtual environment |
+| Hydra | Manages application configuration and reduces hard-coded settings |
+| DVC | Versions machine learning datasets |
+| Git | Provides local source code version control |
+| GitHub | Hosts the shared Team 5 source code repository |
 | Git Branching | Separates feature development from the stable `main` branch |
 | GitHub Pull Requests | Reviews and integrates feature changes |
-| GitHub Actions | Automated Continuous Integration |
-| Pytest | Automated project testing |
-| Flask | Web application framework |
-| PyCaret | Machine learning model development |
-| Jupyter Notebook | EDA and machine learning experimentation |
+| GitHub Actions | Performs automated Continuous Integration |
+| Pytest | Performs automated project testing |
+| Flask | Provides the Team 5 web application |
+| PyCaret | Used for machine learning model development |
+| Jupyter Notebook | Used for EDA and model experimentation |
 
 ---
 
 # Initial Project Creation
 
-The Team 5 repository was initially created using the Cookiecutter Data Science template with Poetry and DVC support.
+The Team 5 repository was initially generated using the Cookiecutter Data Science template with Poetry and DVC support.
 
 ```bash
 cookiecutter https://github.com/khuyentran1401/data-science-template --checkout dvc-poetry
 ```
 
-This generated a standard machine learning project structure containing folders such as:
+The template provided the initial standard ML project structure.
 
-```text
-config/
-data/
-docs/
-models/
-notebooks/
-src/
-tests/
-```
+Unused template files were subsequently removed so that the final repository contains only files and folders relevant to the Team 5 project.
 
-Team members cloning the existing repository do **not** need to run Cookiecutter again.
+Team members cloning this repository do **not** need to run Cookiecutter again.
 
 ---
 
 # C. Development / Deployment Guide
 
-## 1. Prerequisites
+# 1. Prerequisites
 
-Install:
+Install the following software:
 
 - Git
 - Anaconda or Miniconda
 
-Verify Git:
+Check that Git is available:
 
 ```bash
 git --version
@@ -172,22 +164,28 @@ git --version
 
 ---
 
-## 2. Clone the Repository
+# 2. Clone the Repository
 
-Team members should clone the repository rather than use **Download ZIP** for development.
+For collaborative development, use `git clone` instead of downloading the repository as a ZIP file.
 
 ```bash
 git clone https://github.com/KingBisky/IT3385_Team5_Assignment.git
 cd IT3385_Team5_Assignment
 ```
 
-Using `git clone` preserves Git history and allows team members to use branches, commits, pushes, pulls and Pull Requests.
+Using `git clone` preserves:
+
+- Git history
+- branches
+- commits
+- push and pull functionality
+- Pull Request workflow
 
 ---
 
-## 3. Create the Conda Environment
+# 3. Create the Conda Environment
 
-Create the shared Python 3.10 base environment:
+Create the base Python 3.10 environment:
 
 ```bash
 conda create -n mlops_assignment python=3.10
@@ -199,7 +197,7 @@ Activate it:
 conda activate mlops_assignment
 ```
 
-Check:
+Check the Python version:
 
 ```bash
 python --version
@@ -211,11 +209,13 @@ Expected:
 Python 3.10.x
 ```
 
-Conda provides the Python interpreter while Poetry manages the project dependencies.
+Conda provides the base Python interpreter.
+
+Poetry is then used to manage the actual project dependencies and project virtual environment.
 
 ---
 
-## 4. Install Poetry
+# 4. Install Poetry
 
 Inside the activated Conda environment:
 
@@ -223,7 +223,7 @@ Inside the activated Conda environment:
 conda install -c conda-forge poetry
 ```
 
-Verify:
+Verify the installation:
 
 ```bash
 poetry --version
@@ -231,39 +231,39 @@ poetry --version
 
 ---
 
-## 5. Link Poetry to the Conda Python Interpreter
+# 5. Link Poetry to the Conda Python Interpreter
 
-Find the Python executable:
+Find the Python executable used by the Conda environment:
 
 ```bash
 python -c "import sys; print(sys.executable)"
 ```
 
-Example:
+Example output:
 
 ```text
 C:\Users\<USERNAME>\anaconda3\envs\mlops_assignment\python.exe
 ```
 
-Use the path returned on your own computer:
+Use the Python path shown on your own computer:
 
 ```bash
 poetry env use "C:\Users\<USERNAME>\anaconda3\envs\mlops_assignment\python.exe"
 ```
 
-Verify:
+Verify the Poetry environment:
 
 ```bash
 poetry env info
 ```
 
-The Poetry environment should use Python 3.10 and show that it is valid.
+The Poetry environment should use Python 3.10 and show that the environment is valid.
 
-> Each team member must use the Python executable path from their own computer.
+> Each team member must use the Python path generated on their own computer.
 
 ---
 
-## 6. Install Project Dependencies
+# 6. Install Project Dependencies
 
 Project dependencies are declared in:
 
@@ -271,19 +271,19 @@ Project dependencies are declared in:
 pyproject.toml
 ```
 
-Exact resolved versions are stored in:
+The exact resolved dependency versions are stored in:
 
 ```text
 poetry.lock
 ```
 
-Install the environment:
+Install the complete project environment:
 
 ```bash
 poetry install --no-root
 ```
 
-This installs the shared project dependencies without requiring each package to be installed manually.
+There is no need to manually install Flask, PyCaret, Hydra, DVC, Pandas, NumPy or the other project packages individually.
 
 Verify the environment:
 
@@ -291,7 +291,7 @@ Verify the environment:
 poetry run python -c "import pycaret, flask, pandas, numpy, sklearn, hydra; print('TEAM 5 ENVIRONMENT OK')"
 ```
 
-Expected:
+Expected output:
 
 ```text
 TEAM 5 ENVIRONMENT OK
@@ -299,265 +299,21 @@ TEAM 5 ENVIRONMENT OK
 
 ---
 
-# Dataset Organisation
-
-Each team member's full raw dataset is stored under their own folder:
-
-```text
-data/raw/
-├── Kang Bin/
-│   └── tech_mental_health_burnout.csv
-├── Clifton/
-│   └── mental_health_risk_dataset.csv
-└── Long Chen/
-    └── global_ai_jobs.csv
-```
-
-The full CSV files are **not committed directly to GitHub**.
-
-Instead, each dataset is independently version-controlled using DVC.
-
----
-
-# DVC Data Version Control
-
-The project uses **DVC (Data Version Control)** to track changes to the team's full machine learning datasets.
-
-Each dataset is tracked individually rather than tracking the entire `data/raw/` directory as one object.
-
-## Kang Bin
-
-Full dataset:
-
-```text
-data/raw/Kang Bin/tech_mental_health_burnout.csv
-```
-
-DVC metadata:
-
-```text
-data/raw/Kang Bin/tech_mental_health_burnout.csv.dvc
-```
-
----
-
-## Clifton
-
-Full dataset:
-
-```text
-data/raw/Clifton/mental_health_risk_dataset.csv
-```
-
-DVC metadata:
-
-```text
-data/raw/Clifton/mental_health_risk_dataset.csv.dvc
-```
-
----
-
-## Long Chen
-
-Full dataset:
-
-```text
-data/raw/Long Chen/global_ai_jobs.csv
-```
-
-DVC metadata:
-
-```text
-data/raw/Long Chen/global_ai_jobs.csv.dvc
-```
-
----
-
-## How DVC Tracking Works
-
-The full CSV files are excluded from normal Git tracking using `.gitignore`.
-
-For example:
-
-```text
-data/raw/Kang Bin/.gitignore
-data/raw/Clifton/.gitignore
-data/raw/Long Chen/.gitignore
-```
-
-GitHub stores the small `.csv.dvc` metadata files instead.
-
-A `.dvc` file contains information such as:
-
-```yaml
-outs:
-- md5: <dataset-hash>
-  size: <dataset-size>
-  path: <dataset-name>.csv
-```
-
-Therefore:
-
-```text
-Full CSV
-    ↓
-DVC tracks dataset contents and version
-
-.csv.dvc
-    ↓
-Git / GitHub tracks dataset metadata
-```
-
-This allows dataset changes to be versioned separately from source-code changes.
-
----
-
-## Check Whether Data Has Changed
+# 7. Run Automated Tests
 
 Run:
 
 ```bash
-poetry run dvc status
+poetry run pytest tests -v
 ```
 
-If the tracked datasets match their current DVC versions:
+The tests validate important shared components of the project environment.
 
-```text
-Data and pipelines are up to date.
-```
-
-If a dataset changes, DVC reports the modified dataset.
+A successful test run should report that the tests have passed.
 
 ---
 
-## Updating a Dataset Version
-
-For example, after changing Kang Bin's dataset:
-
-```bash
-poetry run dvc add "data/raw/Kang Bin/tech_mental_health_burnout.csv"
-```
-
-For Clifton:
-
-```bash
-poetry run dvc add "data/raw/Clifton/mental_health_risk_dataset.csv"
-```
-
-For Long Chen:
-
-```bash
-poetry run dvc add "data/raw/Long Chen/global_ai_jobs.csv"
-```
-
-The corresponding `.csv.dvc` file is updated with the new dataset hash.
-
-The metadata file can then be committed using Git.
-
-Example:
-
-```bash
-git add "data/raw/Kang Bin/tech_mental_health_burnout.csv.dvc"
-git commit -m "Update Kang Bin dataset version"
-```
-
-This allows a particular Git commit to reference a particular version of the dataset.
-
----
-
-## Accessing the Raw Data
-
-The full raw CSV files are intentionally excluded from GitHub because they are managed using DVC.
-
-The GitHub repository therefore contains the `.csv.dvc` metadata files rather than the full raw datasets.
-
-The current project uses local DVC dataset version tracking and does not use a shared DVC remote.
-
-Team members who require the full raw datasets for EDA or model retraining should place the corresponding dataset in the expected local path:
-
-```text
-data/raw/Kang Bin/tech_mental_health_burnout.csv
-data/raw/Clifton/mental_health_risk_dataset.csv
-data/raw/Long Chen/global_ai_jobs.csv
-```
-
-The existing trained model artefacts can still be used to run the web application without retraining the models.
-
----
-
-# Jupyter Notebook Setup
-
-Register the Poetry environment as a Jupyter kernel:
-
-```bash
-poetry run python -m ipykernel install --user --name it3385-team5-poetry --display-name "Python (IT3385 Team 5 - Poetry)"
-```
-
-Launch Jupyter:
-
-```bash
-poetry run jupyter notebook
-```
-
-Select:
-
-```text
-Python (IT3385 Team 5 - Poetry)
-```
-
-as the notebook kernel.
-
-This ensures that Jupyter uses the same Poetry-managed dependencies as the rest of the project.
-
-Kang Bin's notebook is located at:
-
-```text
-notebooks/Kang Bin/KangBin_Task1&2.ipynb
-```
-
----
-
-# Hydra Configuration
-
-Hydra is used to manage application configuration and reduce hard-coded values in the Python source code.
-
-The main configuration file is:
-
-```text
-config/main.yaml
-```
-
-The Team 5 Flask application reads its server settings from Hydra.
-
-Start normally:
-
-```bash
-poetry run python src/team5_app/app.py
-```
-
-Default:
-
-```text
-http://127.0.0.1:5000
-```
-
-The server port can be changed from the command line without editing the Python source:
-
-```bash
-poetry run python src/team5_app/app.py server.port=5050
-```
-
-Then access:
-
-```text
-http://127.0.0.1:5050
-```
-
-This demonstrates Hydra configuration overrides and minimises hard-coded application settings.
-
----
-
-# Running the Team 5 Web Application
+# 8. Run the Team 5 Web Application
 
 From the project root:
 
@@ -571,17 +327,327 @@ Open:
 http://127.0.0.1:5000
 ```
 
-The landing page displays the integrated Team 5 portal.
+The Team 5 landing page will be displayed.
 
-Kang Bin's Employee Burnout Predictor is currently integrated.
+Kang Bin's Employee Burnout Predictor is currently integrated into the portal.
 
-Clifton's and Long Chen's final ML components will be integrated when completed.
+Clifton's and Long Chen's applications will be integrated when their final ML components are completed.
 
 ---
 
-# Source Code Version Control and Branching
+# Jupyter Notebook Setup
 
-The project uses Git and GitHub for collaborative source-code version control.
+The project notebooks should use the same Poetry environment as the application.
+
+Register the Poetry environment as a Jupyter kernel:
+
+```bash
+poetry run python -m ipykernel install --user --name it3385-team5-poetry --display-name "Python (IT3385 Team 5 - Poetry)"
+```
+
+Launch Jupyter Notebook:
+
+```bash
+poetry run jupyter notebook
+```
+
+When opening a notebook, select:
+
+```text
+Python (IT3385 Team 5 - Poetry)
+```
+
+Kang Bin's notebook is located at:
+
+```text
+notebooks/Kang Bin/KangBin_Task1&2.ipynb
+```
+
+Using the Poetry kernel ensures that the notebook uses the same package versions as the rest of the project.
+
+---
+
+# Hydra Configuration
+
+Hydra is used to manage application configuration and minimise hard-coded values.
+
+The Team 5 Hydra configuration is stored at:
+
+```text
+config/main.yaml
+```
+
+The Flask application's server configuration is defined in this YAML file.
+
+Example configuration:
+
+```yaml
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+server:
+  host: "127.0.0.1"
+  port: 5000
+  use_reloader: false
+  use_debugger: false
+  threaded: true
+```
+
+Start the application normally:
+
+```bash
+poetry run python src/team5_app/app.py
+```
+
+The configured default port is:
+
+```text
+5000
+```
+
+Hydra also allows configuration values to be overridden from the command line.
+
+For example:
+
+```bash
+poetry run python src/team5_app/app.py server.port=5050
+```
+
+The application will then run at:
+
+```text
+http://127.0.0.1:5050
+```
+
+This allows settings to be changed without modifying the Python source code.
+
+---
+
+# Dataset Organisation
+
+Each team member is responsible for one raw dataset.
+
+The local raw dataset structure is:
+
+```text
+data/raw/
+├── Kang Bin/
+│   └── tech_mental_health_burnout.csv
+│
+├── Clifton/
+│   └── mental_health_risk_dataset.csv
+│
+└── Long Chen/
+    └── global_ai_jobs.csv
+```
+
+The full CSV files are stored locally and are intentionally excluded from normal Git tracking.
+
+Instead, DVC is used to version each dataset individually.
+
+---
+
+# DVC Data Version Control
+
+The project uses **DVC (Data Version Control)** to track changes to the full raw machine learning datasets.
+
+Each team member's dataset is tracked individually.
+
+This allows one team member's dataset to be updated without modifying the DVC metadata belonging to another team member.
+
+---
+
+## Kang Bin Dataset
+
+Full dataset:
+
+```text
+data/raw/Kang Bin/tech_mental_health_burnout.csv
+```
+
+DVC metadata:
+
+```text
+data/raw/Kang Bin/tech_mental_health_burnout.csv.dvc
+```
+
+Topic:
+
+```text
+Employee Burnout Prediction
+```
+
+---
+
+## Clifton Dataset
+
+Full dataset:
+
+```text
+data/raw/Clifton/mental_health_risk_dataset.csv
+```
+
+DVC metadata:
+
+```text
+data/raw/Clifton/mental_health_risk_dataset.csv.dvc
+```
+
+Topic:
+
+```text
+Mental Health Risk Prediction
+```
+
+---
+
+## Long Chen Dataset
+
+Full dataset:
+
+```text
+data/raw/Long Chen/global_ai_jobs.csv
+```
+
+DVC metadata:
+
+```text
+data/raw/Long Chen/global_ai_jobs.csv.dvc
+```
+
+Topic:
+
+```text
+Global AI Jobs
+```
+
+---
+
+# How DVC Tracking Works
+
+The actual CSV files are excluded from Git through the `.gitignore` files inside each team member's raw-data folder.
+
+GitHub stores the corresponding `.csv.dvc` metadata files instead.
+
+A DVC metadata file contains information such as:
+
+```yaml
+outs:
+- md5: <dataset-hash>
+  size: <dataset-size>
+  path: <dataset-name>.csv
+```
+
+The workflow is therefore:
+
+```text
+Full CSV
+    ↓
+DVC tracks the dataset contents
+    ↓
+.csv.dvc metadata file
+    ↓
+Git / GitHub tracks the metadata
+```
+
+This separates dataset versioning from normal source-code version control.
+
+---
+
+# Check Dataset Status
+
+To check whether any DVC-tracked dataset has changed:
+
+```bash
+poetry run dvc status
+```
+
+If the tracked datasets match their recorded versions:
+
+```text
+Data and pipelines are up to date.
+```
+
+If a dataset is modified, DVC reports that the corresponding data has changed.
+
+---
+
+# Update a Dataset Version
+
+If Kang Bin's dataset changes:
+
+```bash
+poetry run dvc add "data/raw/Kang Bin/tech_mental_health_burnout.csv"
+```
+
+If Clifton's dataset changes:
+
+```bash
+poetry run dvc add "data/raw/Clifton/mental_health_risk_dataset.csv"
+```
+
+If Long Chen's dataset changes:
+
+```bash
+poetry run dvc add "data/raw/Long Chen/global_ai_jobs.csv"
+```
+
+DVC recalculates the dataset hash and updates the corresponding `.csv.dvc` file.
+
+The updated metadata can then be committed to Git.
+
+Example:
+
+```bash
+git add "data/raw/Kang Bin/tech_mental_health_burnout.csv.dvc"
+git commit -m "Update Kang Bin dataset version"
+```
+
+This allows a Git commit to reference a particular version of the dataset.
+
+---
+
+# Accessing the Raw Datasets
+
+The full raw CSV files are intentionally excluded from GitHub because they are managed using DVC.
+
+The repository therefore contains the DVC metadata files:
+
+```text
+data/raw/Kang Bin/tech_mental_health_burnout.csv.dvc
+
+data/raw/Clifton/mental_health_risk_dataset.csv.dvc
+
+data/raw/Long Chen/global_ai_jobs.csv.dvc
+```
+
+The current implementation uses **local DVC version tracking**.
+
+A shared DVC remote is not currently configured.
+
+Therefore, a fresh clone of the repository contains the DVC metadata but does not automatically contain the full raw CSV files.
+
+For EDA or model retraining, the corresponding raw datasets must be available locally at:
+
+```text
+data/raw/Kang Bin/tech_mental_health_burnout.csv
+
+data/raw/Clifton/mental_health_risk_dataset.csv
+
+data/raw/Long Chen/global_ai_jobs.csv
+```
+
+The existing trained model artefacts can still be used to run the integrated web application without retraining the models.
+
+---
+
+# Source Code Version Control
+
+Git is used for source code version control.
+
+GitHub is used as the shared Team 5 repository.
 
 The stable integration branch is:
 
@@ -589,7 +655,9 @@ The stable integration branch is:
 main
 ```
 
-Development changes are performed using feature branches.
+Development changes should not normally be made directly on `main`.
+
+Instead, feature branches are used.
 
 Example:
 
@@ -603,43 +671,47 @@ main
 
 ---
 
-## Before Starting New Work
+# Team Branching Workflow
 
-Switch to `main`:
+Before starting new work:
 
 ```bash
 git switch main
 ```
 
-Download the latest team changes:
+Download the latest changes:
 
 ```bash
 git pull origin main
 ```
 
-Create a feature branch:
+Create a new feature branch:
 
 ```bash
 git switch -c feature/<branch-name>
 ```
 
-Example:
+Examples:
 
 ```bash
 git switch -c feature/clifton
 ```
 
+```bash
+git switch -c feature/long-chen
+```
+
 ---
 
-## Save and Push Changes
+# Commit and Push Changes
 
-Check:
+Check changed files:
 
 ```bash
 git status
 ```
 
-Stage:
+Stage changes:
 
 ```bash
 git add .
@@ -651,13 +723,13 @@ Commit:
 git commit -m "Describe the changes made"
 ```
 
-For the first push:
+For the first push of a new branch:
 
 ```bash
 git push -u origin feature/<branch-name>
 ```
 
-For later updates:
+For future updates to the same branch:
 
 ```bash
 git push
@@ -669,9 +741,9 @@ git push
 
 After pushing a feature branch:
 
-1. Open the GitHub repository.
+1. Open the Team 5 GitHub repository.
 2. Select **Compare & pull request**.
-3. Confirm:
+3. Confirm that the branches are:
 
 ```text
 base: main
@@ -679,37 +751,35 @@ compare: feature/<branch-name>
 ```
 
 4. Create the Pull Request.
-5. Wait for GitHub Actions CI.
+5. Wait for GitHub Actions CI checks to complete.
 6. Review the changed files.
 7. Merge only after CI passes.
 8. Confirm the merge.
 
-After merging:
+After the Pull Request is merged:
 
 ```bash
 git switch main
 git pull origin main
 ```
 
-This keeps `main` as the stable integration branch.
+This ensures that the local `main` branch matches the latest shared Team 5 version.
 
 ---
 
 # Continuous Integration – GitHub Actions
 
-The shared Continuous Integration workflow is stored at:
+The shared CI workflow is stored at:
 
 ```text
 .github/workflows/ci.yml
 ```
 
-The workflow automatically runs for:
+GitHub Actions automatically runs the CI workflow for:
 
-```text
-push → main
-push → feature/**
-Pull Request → main
-```
+- pushes to `main`
+- pushes to `feature/**` branches
+- Pull Requests targeting `main`
 
 Therefore branches such as:
 
@@ -719,14 +789,20 @@ feature/clifton
 feature/long-chen
 ```
 
-use the same CI pipeline automatically.
+all automatically use the same Team 5 CI pipeline.
 
 ---
 
-## CI Pipeline
+# CI Pipeline
+
+The implemented Continuous Integration process is:
 
 ```text
-Developer pushes code
+Developer changes code
+        ↓
+Feature branch
+        ↓
+git push
         ↓
 GitHub Actions starts
         ↓
@@ -736,28 +812,38 @@ Set up Python 3.10
         ↓
 Install Poetry
         ↓
-Install project dependencies
+Install dependencies
         ↓
-Verify core MLOps tools
+Verify MLOps environment
         ↓
-Run automated Pytest tests
+Run Pytest
         ↓
 PASS ✅ / FAIL ❌
+        ↓
+Pull Request
+        ↓
+Merge into main
 ```
 
-This prevents integration problems from being merged into `main`.
+This helps detect environment or integration problems before code is merged into the stable `main` branch.
 
 ---
 
 # Automated Testing
 
-The environment test is located at:
+Automated project tests are stored in:
+
+```text
+tests/
+```
+
+The current environment test is:
 
 ```text
 tests/test_environment.py
 ```
 
-The current test validates important shared project components including:
+It verifies important project components such as:
 
 ```text
 pyproject.toml
@@ -770,24 +856,30 @@ data/raw/Clifton/mental_health_risk_dataset.csv.dvc
 data/raw/Long Chen/global_ai_jobs.csv.dvc
 ```
 
-Run the same tests locally:
+Run the tests locally:
 
 ```bash
 poetry run pytest tests -v
 ```
 
-The tests are also automatically executed by GitHub Actions.
+The same tests are automatically executed by GitHub Actions.
 
 ---
 
 # Team Development Workflow
 
+The standard Team 5 collaboration process is:
+
 ```text
 Clone repository
       ↓
-Set up Conda + Poetry
+Create Conda Python 3.10 environment
       ↓
-Install dependencies
+Install Poetry
+      ↓
+Link Poetry to Conda Python
+      ↓
+poetry install --no-root
       ↓
 git switch main
       ↓
@@ -795,19 +887,21 @@ git pull origin main
       ↓
 Create feature branch
       ↓
-Develop / enhance ML component
+Develop / enhance component
       ↓
-Test locally
+Run local tests
       ↓
-Commit
+git add
       ↓
-Push
+git commit
+      ↓
+git push
       ↓
 GitHub Actions CI
       ↓
-Pull Request
+Create Pull Request
       ↓
-CI validation
+CI passes
       ↓
 Merge into main
 ```
@@ -818,9 +912,9 @@ This provides a consistent development process for all Team 5 members.
 
 # D. User Guide
 
-## Access the Application
+# Accessing the Team 5 Application
 
-Start the application:
+Start the Team 5 application:
 
 ```bash
 poetry run python src/team5_app/app.py
@@ -838,13 +932,15 @@ The landing page displays the available Team 5 machine learning applications.
 
 # Kang Bin – Employee Burnout Predictor
 
-The Employee Burnout Predictor uses a trained PyCaret machine learning model.
+Kang Bin's component predicts employee burnout using a trained PyCaret machine learning model.
 
-Model file:
+The trained model artefact is located at:
 
 ```text
 src/team5_app/Kang Bin/employee_burnout_app/employee_burnout_final_model.pkl
 ```
+
+---
 
 ## Single Prediction
 
@@ -852,12 +948,16 @@ src/team5_app/Kang Bin/employee_burnout_app/employee_burnout_final_model.pkl
 2. Select the Employee Burnout Predictor.
 3. Enter the required employee information.
 4. Submit the form.
-5. The trained model processes the input.
+5. The trained model processes the user input.
 6. The predicted burnout result is displayed.
+
+---
 
 ## Batch Prediction
 
-The application also supports batch prediction for multiple employee records where applicable.
+The Employee Burnout Predictor also supports batch prediction for multiple employee records where applicable.
+
+Users can submit the required batch input and generate predictions for multiple records.
 
 ---
 
@@ -869,7 +969,13 @@ Dataset:
 data/raw/Clifton/mental_health_risk_dataset.csv
 ```
 
-TODO: Add application inputs, prediction steps and output explanation after Clifton's model is integrated.
+Machine learning component:
+
+```text
+Mental Health Risk Prediction
+```
+
+TODO: Add the final web application instructions after Clifton's application is integrated into the Team 5 portal.
 
 ---
 
@@ -881,17 +987,23 @@ Dataset:
 data/raw/Long Chen/global_ai_jobs.csv
 ```
 
-TODO: Add application inputs, prediction steps and output explanation after Long Chen's model is integrated.
+Machine learning component:
+
+```text
+Global AI Jobs
+```
+
+TODO: Add the final web application instructions after Long Chen's application is integrated into the Team 5 portal.
 
 ---
 
 # Continuous Deployment
 
-GitHub Actions Continuous Integration is currently implemented.
+Continuous Integration using GitHub Actions is currently implemented.
 
 Continuous Deployment will be added when the final integrated Team 5 web application is connected to the selected deployment platform.
 
-The intended final CI/CD lifecycle is:
+The intended complete CI/CD lifecycle is:
 
 ```text
 Feature branch
@@ -900,9 +1012,9 @@ Push
       ↓
 GitHub Actions CI
       ↓
-Pull Request
+Automated tests
       ↓
-Tests pass
+Pull Request
       ↓
 Merge into main
       ↓
@@ -919,13 +1031,15 @@ Live Team 5 web application
 
 https://github.com/KingBisky/IT3385_Team5_Assignment
 
+---
+
 ## Deployed Team Web Application
 
 ```text
-TODO: Add deployed application URL
+TODO: Add deployed Team 5 web application URL
 ```
 
-The deployment URL will be updated after final deployment.
+The deployed application URL will be added after the final integrated web application is deployed.
 
 ---
 
@@ -933,7 +1047,7 @@ The deployment URL will be updated after final deployment.
 
 | MLOps Component | Status |
 |---|---|
-| Standard ML project structure | ✅ Implemented |
+| Standard ML project folder structure | ✅ Implemented |
 | Cookiecutter project template | ✅ Implemented |
 | Conda Python 3.10 environment | ✅ Implemented |
 | Poetry dependency management | ✅ Implemented |
@@ -949,5 +1063,49 @@ The deployment URL will be updated after final deployment.
 | Pull Request workflow | ✅ Implemented |
 | Pytest automated testing | ✅ Implemented |
 | GitHub Actions CI | ✅ Implemented |
+| Team Flask portal | ✅ Implemented |
+| Clifton application integration | ⏳ In progress |
+| Long Chen application integration | ⏳ In progress |
 | Continuous Deployment | ⏳ To be completed |
-| Final integrated team deployment | ⏳ To be completed |
+| Final integrated deployment | ⏳ To be completed |
+```
+
+---
+
+# MLOps Lifecycle Summary
+
+The current Team 5 MLOps workflow is:
+
+```text
+Raw Dataset
+     ↓
+DVC Data Version Control
+     ↓
+Jupyter / PyCaret Model Development
+     ↓
+Poetry Reproducible Environment
+     ↓
+Hydra Configuration
+     ↓
+Flask Web Application
+     ↓
+Git Feature Branch
+     ↓
+GitHub Push
+     ↓
+GitHub Actions CI
+     ↓
+Automated Pytest Validation
+     ↓
+Pull Request
+     ↓
+Merge into main
+     ↓
+Continuous Deployment
+     ↓
+Live Team 5 Web Application
+```
+
+The development portion of the environment is currently implemented.
+
+The final deployment and Continuous Deployment stages will be completed after all individual team applications are integrated.
