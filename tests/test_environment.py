@@ -7,5 +7,11 @@ def test_project_structure():
     assert (root / "pyproject.toml").exists()
     assert (root / "poetry.lock").exists()
     assert (root / "config" / "main.yaml").exists()
-    assert (root / "data" / "raw.dvc").exists()
+    assert (
+    	root
+    	/ "data"
+    	/ "raw"
+    	/ "Kang Bin"
+    	/ "tech_mental_health_burnout.csv.dvc"
+    ).exists()
     assert (root / "src" / "team5_app").exists()
