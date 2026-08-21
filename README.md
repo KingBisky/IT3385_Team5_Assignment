@@ -172,8 +172,27 @@ First, navigate to the directory where you want to store the project. For exampl
 
 ```bash
 cd Desktop
+```
 
----
+Then clone the repository:
+
+```bash
+git clone https://github.com/KingBisky/IT3385_Team5_Assignment.git
+```
+
+After cloning is complete, enter the project directory:
+
+```bash
+cd IT3385_Team5_Assignment
+```
+
+Using `git clone` preserves:
+
+- Git history
+- branches
+- commits
+- push and pull functionality
+- Pull Request workflow
 
 # 3. Create the Conda Environment
 
