@@ -1,0 +1,6 @@
+max_upload_mb: 32
+
+batch:
+  result_ttl_seconds: 21600
+  chunk_size: 5000
+  preview_rows: 20

@@ -1,11 +1,11 @@
+defaults:
+  - server: local
+  - app: default
+  - _self_
+
 hydra:
+  job:
+    chdir: false
   output_subdir: null
   run:
     dir: .
-
-server:
-  host: "127.0.0.1"
-  port: 5000
-  use_reloader: false
-  use_debugger: false
-  threaded: true

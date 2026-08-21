@@ -120,7 +120,7 @@ def long_chen_placeholder():
     )
 
 
-def load_flask_app(module_name: str, app_file: Path):
+def load_flask_module(module_name: str, app_file: Path):
     """Load a teammate Flask app from disk without requiring a Python package.
 
     ``importlib`` is used because team folders contain spaces and should remain
@@ -138,17 +138,27 @@ def load_flask_app(module_name: str, app_file: Path):
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
-    return module.app
+    return module
 
+def build_application(cfg: DictConfig):
+    kang_bin_module = load_flask_module(
+        "kang_bin_employee_burnout",
+        ROOT / "Kang Bin" / "employee_burnout_app" / "app.py",
+    )
 
-# Kang Bin's application owns its own dataset/model folder and is mounted under
-# /kang-bin. Other teammate apps can be mounted in the same mapping later.
-kang_bin_app = load_flask_app(
-    "kang_bin_employee_burnout",
-    ROOT / "Kang Bin" / "employee_burnout_app" / "app.py",
-)
+    kang_bin_module.configure_runtime(
+        max_upload_mb=cfg.app.max_upload_mb,
+        batch_result_ttl_seconds=cfg.app.batch.result_ttl_seconds,
+        batch_chunk_size=cfg.app.batch.chunk_size,
+        batch_preview_rows=cfg.app.batch.preview_rows,
+    )
 
-application = DispatcherMiddleware(portal, {"/kang-bin": kang_bin_app})
+    return DispatcherMiddleware(
+        portal,
+        {
+            "/kang-bin": kang_bin_module.app,
+        },
+    )
 
 
 @hydra.main(
@@ -157,7 +167,7 @@ application = DispatcherMiddleware(portal, {"/kang-bin": kang_bin_app})
     config_name="main",
 )
 def main(cfg: DictConfig) -> None:
-    """Run the integrated Team 5 application using Hydra configuration."""
+    application = build_application(cfg)
 
     run_simple(
         str(cfg.server.host),
