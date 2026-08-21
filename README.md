@@ -7,6 +7,7 @@ The project provides a shared and reproducible development environment for devel
 The current MLOps environment implements:
 
 - Standard ML project folder structure
+- Conda Python environment
 - Poetry dependency management
 - Hydra configuration management
 - DVC data version control
@@ -50,7 +51,12 @@ IT3385_Team5_Assignment/
 │       └── ci.yml
 │
 ├── config/
-│   └── main.yaml
+│   ├── main.yaml
+│   ├── app/
+│   │   └── default.yaml
+│   └── server/
+│       ├── local.yaml
+│       └── development.yaml
 │
 ├── data/
 │   ├── raw/
@@ -117,14 +123,14 @@ The project structure separates configuration, datasets, notebooks, application 
 | Cookiecutter | Generated the initial standard ML project structure |
 | Conda | Provides the base Python 3.10 interpreter |
 | Poetry | Manages project dependencies and the project virtual environment |
-| Hydra | Manages application configuration and reduces hard-coded settings |
+| Hydra | Manages server and application runtime configuration using reusable YAML configuration groups and command-line overrides |
 | DVC | Versions machine learning datasets |
 | Git | Provides local source code version control |
 | GitHub | Hosts the shared Team 5 source code repository |
 | Git Branching | Separates feature development from the stable `main` branch |
 | GitHub Pull Requests | Reviews and integrates feature changes |
 | GitHub Actions | Performs automated Continuous Integration |
-| Pytest | Performs automated project testing |
+| Pytest | Performs automated project and configuration testing |
 | Flask | Provides the Team 5 web application |
 | PyCaret | Used for machine learning model development |
 | Jupyter Notebook | Used for EDA and model experimentation |
@@ -194,9 +200,11 @@ Using `git clone` preserves:
 - push and pull functionality
 - Pull Request workflow
 
+---
+
 # 3. Create the Conda Environment
 
-Create the base Python 3.10 environment:
+Create a Conda environment that provides the project's Python 3.10 interpreter:
 
 ```bash
 conda create -n mlops_assignment python=3.10
@@ -318,9 +326,16 @@ Run:
 poetry run pytest tests -v
 ```
 
-The tests validate important shared components of the project environment.
+The current automated tests validate:
 
-A successful test run should report that the tests have passed.
+- Required project files and directories
+- DVC tracking metadata for all three team datasets
+- Hydra default configuration composition
+- Hydra server configuration values
+- Hydra application runtime configuration values
+- Hydra configuration overrides
+
+A successful test run should report that all tests have passed.
 
 ---
 
@@ -380,59 +395,203 @@ Using the Poetry kernel ensures that the notebook uses the same package versions
 
 # Hydra Configuration
 
-Hydra is used to manage application configuration and minimise hard-coded values.
+Hydra is used to separate application configuration from the Python source code and provide a consistent way to manage runtime settings.
 
-The Team 5 Hydra configuration is stored at:
+The configuration is organised into reusable configuration groups:
+
+```text
+config/
+├── main.yaml
+├── app/
+│   └── default.yaml
+└── server/
+    ├── local.yaml
+    └── development.yaml
+```
+
+This structure separates general Hydra settings, application runtime settings and server settings.
+
+## Main Configuration
+
+The main Hydra configuration is stored at:
 
 ```text
 config/main.yaml
 ```
 
-The Flask application's server configuration is defined in this YAML file.
-
-Example configuration:
+It defines which configuration groups are loaded by default:
 
 ```yaml
+defaults:
+  - server: local
+  - app: default
+  - _self_
+
 hydra:
+  job:
+    chdir: false
   output_subdir: null
   run:
     dir: .
-
-server:
-  host: "127.0.0.1"
-  port: 5000
-  use_reloader: false
-  use_debugger: false
-  threaded: true
 ```
 
-Start the application normally:
-
-```bash
-poetry run python src/team5_app/app.py
-```
-
-The configured default port is:
+The default configuration therefore combines:
 
 ```text
-5000
+config/server/local.yaml
 ```
 
-Hydra also allows configuration values to be overridden from the command line.
+and:
 
-For example:
+```text
+config/app/default.yaml
+```
+
+into one Hydra configuration when the Team 5 application starts.
+
+Setting:
+
+```yaml
+hydra:
+  job:
+    chdir: false
+```
+
+prevents Hydra from changing the application's working directory when the program starts.
+
+This is important because the Team 5 application uses project-relative paths for application files and machine learning model artefacts.
+
+---
+
+## Server Configuration
+
+The default local server configuration is stored at:
+
+```text
+config/server/local.yaml
+```
+
+It contains:
+
+```yaml
+host: "127.0.0.1"
+port: 5000
+use_reloader: false
+use_debugger: false
+threaded: true
+```
+
+These settings control how the integrated Flask application is started.
+
+The default application therefore runs at:
+
+```text
+http://127.0.0.1:5000
+```
+
+A separate development server profile is stored at:
+
+```text
+config/server/development.yaml
+```
+
+The development profile enables development-oriented Flask settings such as the reloader and debugger.
+
+It can be selected without modifying the Python source code:
+
+```bash
+poetry run python src/team5_app/app.py server=development
+```
+
+This makes it possible to maintain different runtime profiles while keeping the application's source code unchanged.
+
+---
+
+## Application Runtime Configuration
+
+Application-level runtime settings are stored at:
+
+```text
+config/app/default.yaml
+```
+
+The current configuration is:
+
+```yaml
+max_upload_mb: 32
+
+batch:
+  result_ttl_seconds: 21600
+  chunk_size: 5000
+  preview_rows: 20
+```
+
+These values control operational behaviour in the integrated Employee Burnout Predictor.
+
+The settings include:
+
+- `max_upload_mb` – maximum allowed upload size
+- `result_ttl_seconds` – amount of time generated batch results remain available
+- `chunk_size` – number of records processed per batch chunk
+- `preview_rows` – number of batch prediction rows displayed in the preview
+
+The Flask component retains default values so that it can still operate independently.
+
+When the application is launched through the Team 5 portal, the Hydra configuration is loaded and the configured runtime values are applied to the integrated application.
+
+The runtime flow is therefore:
+
+```text
+Hydra YAML configuration
+        ↓
+config/main.yaml
+        ↓
+Server + application configuration groups
+        ↓
+Hydra DictConfig
+        ↓
+Team 5 Flask application
+        ↓
+Integrated ML application runtime settings
+```
+
+This keeps operational configuration separate from application logic and avoids requiring Python source-code changes when runtime values need to be adjusted.
+
+---
+
+## Hydra Command-Line Overrides
+
+Hydra also allows configuration values to be overridden directly from the command line.
+
+For example, the Flask server can be started on port `5050`:
 
 ```bash
 poetry run python src/team5_app/app.py server.port=5050
 ```
 
-The application will then run at:
+The application will then be available at:
 
 ```text
 http://127.0.0.1:5050
 ```
 
-This allows settings to be changed without modifying the Python source code.
+Application settings can also be overridden.
+
+For example:
+
+```bash
+poetry run python src/team5_app/app.py app.batch.preview_rows=5
+```
+
+Multiple configuration values can be changed in the same command:
+
+```bash
+poetry run python src/team5_app/app.py server.port=5050 app.max_upload_mb=64 app.batch.chunk_size=10000 app.batch.preview_rows=50
+```
+
+These overrides apply only to that application run and do not require changes to the YAML or Python source files.
+
+This provides a reproducible configuration system while still allowing developers to experiment with different runtime settings.
 
 ---
 
@@ -628,9 +787,7 @@ The repository therefore contains the DVC metadata files:
 
 ```text
 data/raw/Kang Bin/tech_mental_health_burnout.csv.dvc
-
 data/raw/Clifton/mental_health_risk_dataset.csv.dvc
-
 data/raw/Long Chen/global_ai_jobs.csv.dvc
 ```
 
@@ -644,9 +801,7 @@ For EDA or model retraining, the corresponding raw datasets must be available lo
 
 ```text
 data/raw/Kang Bin/tech_mental_health_burnout.csv
-
 data/raw/Clifton/mental_health_risk_dataset.csv
-
 data/raw/Long Chen/global_ai_jobs.csv
 ```
 
@@ -848,32 +1003,82 @@ Automated project tests are stored in:
 tests/
 ```
 
-The current environment test is:
+The current test module is:
 
 ```text
 tests/test_environment.py
 ```
 
-It verifies important project components such as:
+The test suite currently contains three tests covering the shared project environment and Hydra configuration.
+
+## Project Structure Test
+
+The project structure test verifies that important shared project files and directories are present, including:
 
 ```text
 pyproject.toml
 poetry.lock
 config/main.yaml
 src/team5_app/
-
 data/raw/Kang Bin/tech_mental_health_burnout.csv.dvc
 data/raw/Clifton/mental_health_risk_dataset.csv.dvc
 data/raw/Long Chen/global_ai_jobs.csv.dvc
 ```
 
-Run the tests locally:
+This helps identify missing files that could prevent another team member or the CI environment from reproducing the project setup.
+
+## Hydra Configuration Test
+
+The Hydra configuration test composes the project's default configuration and verifies expected values such as:
+
+```text
+server.host = 127.0.0.1
+server.port = 5000
+
+app.max_upload_mb = 32
+app.batch.result_ttl_seconds = 21600
+app.batch.chunk_size = 5000
+app.batch.preview_rows = 20
+```
+
+This confirms that:
+
+```text
+config/main.yaml
+config/server/local.yaml
+config/app/default.yaml
+```
+
+are composed correctly.
+
+## Hydra Override Test
+
+A separate test confirms that Hydra configuration values can be overridden successfully.
+
+The test uses example overrides such as:
+
+```text
+server.port=5050
+app.batch.chunk_size=10000
+```
+
+and verifies that Hydra returns the overridden values.
+
+This confirms that command-line configuration changes can be used without modifying the project's source code.
+
+Run all tests locally using:
 
 ```bash
 poetry run pytest tests -v
 ```
 
-The same tests are automatically executed by GitHub Actions.
+A successful run should report:
+
+```text
+3 passed
+```
+
+The same test suite is automatically executed by GitHub Actions as part of the Continuous Integration workflow.
 
 ---
 
@@ -891,6 +1096,10 @@ Install Poetry
 Link Poetry to Conda Python
       ↓
 poetry install --no-root
+      ↓
+Verify environment
+      ↓
+Run automated tests
       ↓
 git switch main
       ↓
@@ -969,6 +1178,8 @@ src/team5_app/Kang Bin/employee_burnout_app/employee_burnout_final_model.pkl
 The Employee Burnout Predictor also supports batch prediction for multiple employee records where applicable.
 
 Users can submit the required batch input and generate predictions for multiple records.
+
+Batch processing behaviour such as upload limits, processing chunk size and preview row limits is managed through the application's Hydra configuration.
 
 ---
 
@@ -1064,7 +1275,10 @@ The deployed application URL will be added after the final integrated web applic
 | Poetry dependency management | ✅ Implemented |
 | Poetry lock file | ✅ Implemented |
 | Jupyter Poetry kernel | ✅ Implemented |
-| Hydra configuration | ✅ Implemented |
+| Hydra configuration management | ✅ Implemented |
+| Hydra configuration groups and profiles | ✅ Implemented |
+| Hydra runtime overrides | ✅ Implemented |
+| Hydra configuration testing | ✅ Implemented |
 | Kang Bin dataset DVC tracking | ✅ Implemented |
 | Clifton dataset DVC tracking | ✅ Implemented |
 | Long Chen dataset DVC tracking | ✅ Implemented |
@@ -1075,11 +1289,11 @@ The deployed application URL will be added after the final integrated web applic
 | Pytest automated testing | ✅ Implemented |
 | GitHub Actions CI | ✅ Implemented |
 | Team Flask portal | ✅ Implemented |
+| Kang Bin application integration | ✅ Implemented |
 | Clifton application integration | ⏳ In progress |
 | Long Chen application integration | ⏳ In progress |
 | Continuous Deployment | ⏳ To be completed |
 | Final integrated deployment | ⏳ To be completed |
-```
 
 ---
 
@@ -1094,19 +1308,21 @@ DVC Data Version Control
      ↓
 Jupyter / PyCaret Model Development
      ↓
-Poetry Reproducible Environment
+Conda Python 3.10 Environment
      ↓
-Hydra Configuration
+Poetry Dependency Management
+     ↓
+Hydra Runtime Configuration
      ↓
 Flask Web Application
+     ↓
+Automated Pytest Validation
      ↓
 Git Feature Branch
      ↓
 GitHub Push
      ↓
 GitHub Actions CI
-     ↓
-Automated Pytest Validation
      ↓
 Pull Request
      ↓
@@ -1117,6 +1333,6 @@ Continuous Deployment
 Live Team 5 Web Application
 ```
 
-The development portion of the environment is currently implemented.
+The development and Continuous Integration portions of the environment are currently implemented.
 
 The final deployment and Continuous Deployment stages will be completed after all individual team applications are integrated.

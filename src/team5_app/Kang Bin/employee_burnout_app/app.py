@@ -53,6 +53,28 @@ BATCH_RESULT_TTL_SECONDS = 6 * 60 * 60
 BATCH_CHUNK_SIZE = 5000
 BATCH_PREVIEW_ROWS = 20
 
+
+def configure_runtime(
+    max_upload_mb: int = 32,
+    batch_result_ttl_seconds: int = 21600,
+    batch_chunk_size: int = 5000,
+    batch_preview_rows: int = 20,
+) -> None:
+    """Apply runtime settings supplied by the Team 5 Hydra configuration."""
+
+    global MAX_UPLOAD_MB
+    global BATCH_RESULT_TTL_SECONDS
+    global BATCH_CHUNK_SIZE
+    global BATCH_PREVIEW_ROWS
+
+    MAX_UPLOAD_MB = int(max_upload_mb)
+    BATCH_RESULT_TTL_SECONDS = int(batch_result_ttl_seconds)
+    BATCH_CHUNK_SIZE = int(batch_chunk_size)
+    BATCH_PREVIEW_ROWS = int(batch_preview_rows)
+
+    app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
+
+
 model = load_model(str(MODEL_NAME))
 
 
