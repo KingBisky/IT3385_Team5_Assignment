@@ -72,16 +72,16 @@ TEAM_PROJECTS = [
     {
         "name": "Long Chen",
         "initials": "LC",
-        "status": "Coming soon",
-        "title": "Machine Learning Project",
+        "status": "Live",
+        "title": "Employee Salary Predictor",
         "description": (
-            "Long Chen's project has a dedicated route ready for a separate "
-            "dataset and model, without affecting the other team applications."
+            "Estimates an employee's expected salary in real time from role, "
+            "company, and market signals using a trained regression pipeline."
         ),
-        "dataset": "Independent dataset supported",
-        "capabilities": ["Own dataset", "Own model", "Shared portal"],
+        "dataset": "Employee salary dataset",
+        "capabilities": ["Real-time prediction", "Auto re-appraise on input change"],
         "href": "/long-chen/",
-        "active": False,
+        "active": True,
     },
 ]
 
@@ -102,20 +102,6 @@ def clifton_placeholder():
         message=(
             "This route is ready for Clifton's model and dataset. Once his app is "
             "added, it can be mounted here without changing the rest of the portal."
-        ),
-    )
-
-
-@portal.route("/long-chen/")
-def long_chen_placeholder():
-    """Temporary integrated page until Long Chen's Flask app is added."""
-    return render_template(
-        "placeholder.html",
-        member_name="Long Chen",
-        initials="LC",
-        message=(
-            "This route is ready for Long Chen's model and dataset. His project can "
-            "stay self-contained while still feeling like part of one application."
         ),
     )
 
@@ -153,10 +139,16 @@ def build_application(cfg: DictConfig):
         batch_preview_rows=cfg.app.batch.preview_rows,
     )
 
+    long_chen_module = load_flask_module(
+        "long_chen_salary_predictor",
+        ROOT / "Long Chen" / "salary_predictor_app" / "app.py",
+    )
+
     return DispatcherMiddleware(
         portal,
         {
             "/kang-bin": kang_bin_module.app,
+            "/long-chen": long_chen_module.app,
         },
     )
 

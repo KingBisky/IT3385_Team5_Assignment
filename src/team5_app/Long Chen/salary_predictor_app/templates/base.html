@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07131f" />
+  <title>{% block title %}Employee Salary Predictor · IT3385 Team 5{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="aurora aurora-one" aria-hidden="true"></div>
+
+  <main class="page">
+    <nav class="masthead">
+      <a href="/" class="masthead__brand">
+        <span class="masthead__mark">LC</span>
+        <span class="masthead__wordmark">Employee Salary Predictor</span>
+      </a>
+      <a class="masthead__back" href="/">&larr; Back to Team 5 portal</a>
+    </nav>
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

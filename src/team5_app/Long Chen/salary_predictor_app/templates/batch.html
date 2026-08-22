@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Batch Salary Prediction{% endblock %}
+
+{% block content %}
+<div class="desk-header">
+  <h1>Batch prediction</h1>
+  <p>Upload a CSV with the same columns as the single-record form.</p>
+</div>
+
+<form id="batch-form" class="ledger-form" enctype="multipart/form-data">
+  <input type="file" name="file" accept=".csv" required style="margin-bottom:1rem;" />
+  <button type="submit" class="button button--primary">Upload &amp; predict</button>
+</form>
+
+<div id="batch-result" style="margin-top:1.5rem;"></div>
+
+<script>
+document.getElementById("batch-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const res = await fetch("/batch/predict", { method: "POST", body: formData });
+  const data = await res.json();
+  const out = document.getElementById("batch-result");
+  if (!res.ok) {
+    out.innerHTML = `<p style="color:var(--danger)">${data.error}</p>`;
+    return;
+  }
+  out.innerHTML = `
+    <p>${data.row_count} rows predicted.</p>
+    <a class="button button--primary" href="${data.download_url}">Download full results</a>
+  `;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Employee Salary Predictor{% endblock %}
+
+{% block content %}
+<div class="desk-header">
+  <h1>Employee Salary Predictor</h1>
+  <p>Fill in the record below — the estimate updates as you type.</p>
+</div>
+
+<div class="predict-layout">
+  <form id="predict-form" class="ledger-form">
+    {% for group_name, fields in groups.items() %}
+    <fieldset class="ledger-form__group">
+      <legend>{{ group_name }}</legend>
+      <div class="ledger-form__grid">
+        {% for f in fields %}
+        <label class="field">
+          <span class="field__label">{{ f.label }}</span>
+          {% if f.kind == "select" %}
+          <select name="{{ f.name }}" data-field="{{ f.name }}">
+            {% for opt in f.options %}
+            <option value="{{ opt }}" {% if opt == f.default %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+          {% else %}
+          <input type="number" name="{{ f.name }}" data-field="{{ f.name }}"
+                 value="{{ f.default }}" min="{{ f.min }}" max="{{ f.max }}" step="{{ f.step }}" />
+          {% endif %}
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    {% endfor %}
+    <a class="back-link" href="{{ url_for('batch_form') }}">Batch predict from CSV &rarr;</a>
+    <button type="submit" class="button button--primary">Predict salary &rarr;</button>
+  </form>
+
+  <aside class="receipt" id="receipt">
+    <div class="receipt__stamp" id="receipt-stamp">PENDING</div>
+    <p class="receipt__label">Estimated annual salary</p>
+    <p class="receipt__amount" id="receipt-amount">$&mdash;</p>
+    <p class="receipt__note" id="receipt-note">Adjust any field and the prediction updates automatically.</p>
+  </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/salary_predictor.js') }}"></script>
+{% endblock %}
