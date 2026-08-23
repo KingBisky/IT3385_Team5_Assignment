@@ -1095,12 +1095,7 @@ This URL matches the repository's configured `origin` remote.
 
 ## Deployed Team Web Application
 
-**Current status:** a verified production deployment URL is not present in the current repository.
-
-```text
-TODO BEFORE FINAL SUBMISSION:
-<insert verified deployed application URL here>
-```
+Deployed at : https://team5-app-873480729550.asia-southeast1.run.app
 
 Before submitting the assignment:
 
