@@ -101,6 +101,13 @@ IT3385_Team5_Assignment/
 │       │
 │       ├── Clifton/
 │       └── Long Chen/
+│           └── salary_predictor_app/
+│               ├── app.py
+│               ├── employee_salary_final_model.pkl
+│               ├── requirements.txt
+│               ├── schema.py
+│               ├── static/
+│               └── templates/
 │
 ├── tests/
 │   ├── __init__.py
@@ -317,8 +324,54 @@ TEAM 5 ENVIRONMENT OK
 ```
 
 ---
+# 7. Dependency Management with Poetry
 
-# 7. Run Automated Tests
+## Add a new dependency
+```bash
+poetry add <package>
+```
+
+Example:
+poetry add catboost
+
+## Add a specific version
+```bash
+poetry add catboost@1.2.5
+```
+
+## Add a development dependency
+```bash
+poetry add --group dev pytest
+```
+
+## Update dependencies
+```bash
+poetry update
+```
+
+## Update one dependency
+```bash
+poetry update <package>
+```
+
+## Remove a dependency
+```bash
+poetry remove <package>
+```
+
+## Verify the environment
+```bash
+poetry install --no-root
+poetry run pytest tests -v
+```
+
+## Check dependency changes
+```bash
+git diff pyproject.toml poetry.lock
+```
+---
+
+# 8. Run Automated Tests
 
 Run:
 
@@ -339,7 +392,7 @@ A successful test run should report that all tests have passed.
 
 ---
 
-# 8. Run the Team 5 Web Application
+# 9. Run the Team 5 Web Application
 
 From the project root:
 
