@@ -123,11 +123,6 @@
         </section>
         {% endif %}
 
-        <div class="validation-summary" id="validation-summary" role="alert" aria-live="assertive" hidden>
-            <strong>Some values need attention.</strong>
-            <span id="validation-summary-text">Please correct the highlighted fields before predicting.</span>
-        </div>
-
         <form action="{{ url_for('predict') }}" method="POST" id="prediction-form" novalidate>
             {% for section in form_sections %}
             <section class="form-card">
@@ -330,10 +325,10 @@
     </div>
 
     <script>
-        // ---------- Single-prediction validation ----------
+        // -------------------------------------------------------------------
+        // Single-prediction validation (Fixed!)
+        // -------------------------------------------------------------------
         const form = document.getElementById('prediction-form');
-        const summary = document.getElementById('validation-summary');
-        const summaryText = document.getElementById('validation-summary-text');
         const inputs = Array.from(form.querySelectorAll('input, select'));
         const predictButton = document.getElementById('predict-button');
 
@@ -346,6 +341,14 @@
             const errorElement = document.getElementById(`${element.id}-error`);
             const label = labelFor(element);
             let message = '';
+
+            // FIXED: We only validate <input type="number"> elements here.
+            // All <select> elements are guaranteed valid by their options.
+            if (element.tagName === 'SELECT') {
+                element.classList.remove('invalid');
+                errorElement.textContent = '';
+                return '';
+            }
 
             if (!String(element.value).trim()) {
                 message = `${label} is required.`;
@@ -373,21 +376,20 @@
             const messages = inputs.map(validateField).filter(Boolean);
             if (messages.length) {
                 event.preventDefault();
-                summary.hidden = false;
-                summaryText.textContent = `${messages.length} field${messages.length === 1 ? '' : 's'} need attention. Check the highlighted values.`;
+                alert(`${messages.length} field(s) need attention. Please check the highlighted values.`);
                 const firstInvalid = form.querySelector('.invalid');
                 if (firstInvalid) firstInvalid.focus();
-                summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
 
-            summary.hidden = true;
             predictButton.classList.add('is-loading');
             predictButton.disabled = true;
             predictButton.querySelector('.button-text').textContent = 'Running model…';
         });
 
-        // ---------- Batch upload interactions ----------
+        // -------------------------------------------------------------------
+        // Batch upload interactions
+        // -------------------------------------------------------------------
         const batchForm = document.getElementById('batch-form');
         const batchInput = document.getElementById('batch_file');
         const dropzone = document.getElementById('dropzone');

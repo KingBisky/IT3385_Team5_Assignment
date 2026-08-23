@@ -18,10 +18,11 @@ pycaret = "3.3.2"
 pandas = "2.1.4"
 numpy = "1.26.4"
 scikit-learn = "1.4.2"
-category-encoders = "2.6.3"
+category-encoders = "2.7.0"
 catboost = "1.2.5"
 
 pathspec = "0.11.2"
+lightgbm = "4.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.3.5"
