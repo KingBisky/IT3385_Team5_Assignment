@@ -991,17 +991,27 @@ Cloud Run rolls out a new revision at the existing production URL — no URL cha
 
 ## 1. Access the Team 5 Portal
 
-Start the application:
+Open the deployed application:
 
+```text
 https://team5-app-873480729550.asia-southeast1.run.app
+```
 
 The home page displays the Team 5 machine learning applications.
+
+> The application can also be run locally with `poetry run python src/team5_app/app.py`, available at `http://127.0.0.1:5000` — see **Section C** for local setup instructions.
 
 ---
 
 # 2. Kang Bin – Employee Burnout Predictor
 
 Open:
+
+```text
+https://team5-app-873480729550.asia-southeast1.run.app/kang-bin/
+```
+
+or
 
 ```text
 http://127.0.0.1:5000/kang-bin/
@@ -1073,6 +1083,12 @@ Result TTL:     21600 seconds (6 hours)
 Open:
 
 ```text
+https://team5-app-873480729550.asia-southeast1.run.app/long-chen/
+```
+
+or
+
+```text
 http://127.0.0.1:5000/long-chen/
 ```
 
@@ -1122,11 +1138,17 @@ predicted_salary_usd
 The shared portal reserves:
 
 ```text
+https://team5-app-873480729550.asia-southeast1.run.app/clifton/
+```
+
+or
+
+```text
 http://127.0.0.1:5000/clifton/
 ```
 
-The current repository still uses a placeholder route for Clifton. The final application instructions should be added here after Clifton's trained model and Flask component are integrated.
 
+The current repository still uses a placeholder route for Clifton. The final application instructions should be added here after Clifton's trained model and Flask component are integrated.
 ---
 
 # E. URLs
@@ -1150,7 +1172,7 @@ Pre-submission verification (completed):
 - [x] Team 5 portal loads correctly.
 - [x] Kang Bin's prediction flow verified.
 - [x] Long Chen's prediction flow verified.
-- [ ] Cliffton's prediction flow verified
+- [ ] Clifton's prediction flow verified
 - [x] URL confirmed working independent of any developer's local machine.
 
 ---
