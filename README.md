@@ -27,9 +27,9 @@ The current MLOps environment implements:
 
 | Team Member | Dataset / Individual Work |
 |---|---|
-| Kang Bin | Employee Burnout Prediction – EDA, machine learning model, Flask prediction application and MLOps environment setup |
-| Clifton | Mental Health Risk Prediction – Mental Health Risk dataset and machine learning component |
-| Long Chen | Global AI Jobs – Global AI Jobs dataset and machine learning component |
+| Kang Bin | Employee Burnout Prediction – EDA, machine learning model, Flask prediction application, Development environment setup (Conda, Poetry, Hydra, DVC, Git branching, Pytest, CI) |
+| Clifton | Mental Health Risk Prediction – EDA, machine learning model, Flask prediction application |
+| Long Chen | Global AI Jobs – EDA, machine learning model, Flask prediction application, and Deployment environment setup (CI/CD pipeline, cloud deployment, infrastructure management)|
 
 Each team member is responsible for an individual dataset and machine learning component.
 
