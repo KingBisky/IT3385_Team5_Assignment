@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d1f2d">
+    <title>{% block title %}Clifton · Mental Health Risk Predictor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="ambient ambient-a" aria-hidden="true"></div>
+    <div class="ambient ambient-b" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <main class="shell">
+        <nav class="topbar">
+            <a class="brand" href="{{ url_for('home') }}">
+                <span class="brand-mark">CL</span>
+                <span>
+                    <strong>MindSignal</strong>
+                    <small>Clifton · Team 5</small>
+                </span>
+            </a>
+
+            <div class="nav-actions">
+                <a class="nav-link {% if request.endpoint == 'home' %}is-active{% endif %}" href="{{ url_for('home') }}">Single</a>
+                <a class="nav-link {% if request.endpoint in ['batch_form', 'batch_template', 'batch_predict', 'batch_download'] %}is-active{% endif %}" href="{{ url_for('batch_form') }}">Batch</a>
+                <a class="portal-link" href="/">Team portal ↗</a>
+            </div>
+        </nav>
+
+        {% block content %}{% endblock %}
+
+        <footer class="footer">
+            <span>IT3385 Team 5 · Clifton</span>
+            <span>Educational ML prototype · not a clinical diagnosis</span>
+        </footer>
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

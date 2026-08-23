@@ -11,7 +11,7 @@ The repository currently includes:
 - A shared Team 5 Flask portal
 - Kang Bin's **Employee Burnout Predictor** integrated at `/kang-bin/`
 - Long Chen's **Employee Salary Predictor** integrated at `/long-chen/`
-- A reserved placeholder route for Clifton's application at `/clifton/`
+- Clifton's **Mental Health Risk Predictor** integrated at `/clifton/` with single and batch prediction
 - Poetry dependency and virtual-environment management
 - Hydra runtime configuration
 - DVC dataset version tracking
@@ -100,7 +100,12 @@ IT3385_Team5_Assignment/
 │       │       └── templates/
 │       │
 │       ├── Clifton/
-│       │   └── README.txt
+│       │   └── mental_health_risk_app/
+│       │       ├── app.py
+│       │       ├── clifton_mental_health_risk_final_model.pkl
+│       │       ├── samples/
+│       │       ├── static/
+│       │       └── templates/
 │       │
 │       └── Long Chen/
 │           └── salary_predictor_app/
@@ -126,7 +131,7 @@ IT3385_Team5_Assignment/
 | `src/team5_app/app.py` | Main entry point. Loads the Team 5 portal and mounts the integrated Flask applications |
 | `src/team5_app/Kang Bin/employee_burnout_app/` | Kang Bin's Employee Burnout Predictor and trained classification model |
 | `src/team5_app/Long Chen/salary_predictor_app/` | Long Chen's Employee Salary Predictor and trained regression model |
-| `src/team5_app/Clifton/` | Reserved location for Clifton's application; currently contains a placeholder/readme |
+| `src/team5_app/Clifton/mental_health_risk_app/` | Clifton's integrated single + batch Mental Health Risk Predictor and trained pipeline |
 | `config/` | Hydra configuration for server and application runtime settings |
 | `data/raw/` | Team datasets; full CSV files are locally stored while `.dvc` metadata is tracked by Git |
 | `notebooks/` | EDA and model-development notebooks |
@@ -625,6 +630,7 @@ The trained model artefacts are already stored inside their application folders:
 
 ```text
 src/team5_app/Kang Bin/employee_burnout_app/employee_burnout_final_model.pkl
+src/team5_app/Clifton/mental_health_risk_app/clifton_mental_health_risk_final_model.pkl
 src/team5_app/Long Chen/salary_predictor_app/employee_salary_final_model.pkl
 ```
 
@@ -651,7 +657,7 @@ Available routes:
 | `/` | Team 5 portal | Live |
 | `/kang-bin/` | Employee Burnout Predictor | Live |
 | `/long-chen/` | Employee Salary Predictor | Live |
-| `/clifton/` | Clifton placeholder route | Awaiting final integration |
+| `/clifton/` | Mental Health Risk Predictor | Live in integrated source (redeploy final revision) |
 
 ---
 
@@ -926,7 +932,7 @@ For a deployment platform, the deployment must:
    ```
 5. Provide the application with a host/port configuration appropriate for the selected platform.
 6. Keep the saved `.pkl` model files available at their repository-relative paths.
-7. /, /kang-bin/, and /long-chen/ have been tested on the deployed Cloud Run service and confirmed working.
+7. After the final redeploy, verify `/`, `/kang-bin/`, `/clifton/`, and `/long-chen/` on the deployed Cloud Run revision; `scripts/verify_clifton_deployment.py` automates Clifton's single + batch smoke checks.
 
 
 ## Deploying After Changes
@@ -1135,20 +1141,53 @@ predicted_salary_usd
 
 # 4. Clifton – Mental Health Risk Predictor
 
-The shared portal reserves:
+Open the integrated application at:
 
 ```text
 https://team5-app-873480729550.asia-southeast1.run.app/clifton/
 ```
 
-or
+or locally at:
 
 ```text
 http://127.0.0.1:5000/clifton/
 ```
 
+The model is loaded from:
 
-The current repository still uses a placeholder route for Clifton. The final application instructions should be added here after Clifton's trained model and Flask component are integrated.
+```text
+src/team5_app/Clifton/mental_health_risk_app/clifton_mental_health_risk_final_model.pkl
+```
+
+## Single Prediction
+
+1. Open Clifton's predictor.
+2. Enter the nine validated mental-health/lifestyle signals.
+3. Submit the profile.
+4. The saved PyCaret classification pipeline returns Low, Moderate or High risk.
+5. The page displays model confidence and per-class probabilities when available.
+
+All numeric and binary inputs are validated again on the server before inference.
+
+## Batch Prediction
+
+1. Open `/clifton/batch`.
+2. Download the CSV template or use `src/team5_app/Clifton/mental_health_risk_app/samples/clifton_batch_demo.csv`.
+3. Upload the CSV.
+4. The application validates the complete schema and every row.
+5. Predictions are generated in configured chunks.
+6. Review the Low/Moderate/High counts, mean confidence and preview.
+7. Download the full result CSV containing the predicted class, label and confidence.
+
+## Health / deployment verification
+
+`/clifton/health` performs a deep saved-model load check. After the final Cloud Run redeploy, run:
+
+```bash
+python scripts/verify_clifton_deployment.py https://team5-app-873480729550.asia-southeast1.run.app
+```
+
+This provides repeatable evidence for both single and batch real-time prediction.
 ---
 
 # E. URLs
@@ -1172,7 +1211,7 @@ Pre-submission verification (completed):
 - [x] Team 5 portal loads correctly.
 - [x] Kang Bin's prediction flow verified.
 - [x] Long Chen's prediction flow verified.
-- [ ] Clifton's prediction flow verified
+- [ ] Re-verify Clifton's single + batch flow after deploying this final revision (`scripts/verify_clifton_deployment.py`)
 - [x] URL confirmed working independent of any developer's local machine.
 
 ---
@@ -1202,7 +1241,7 @@ Pre-submission verification (completed):
 | Team Flask portal | ✅ Implemented |
 | Kang Bin application integration | ✅ Implemented |
 | Long Chen application integration | ✅ Implemented |
-| Clifton application integration | ⏳ Pending |
+| Clifton application integration | ✅ Implemented |
 | Continuous Deployment | ✅ Implemented |
 | Verified production deployment URL | ✅ Implemented |
 
@@ -1244,4 +1283,4 @@ Production deployment (Google Cloud Run)
 Live at https://team5-app-873480729550.asia-southeast1.run.app/
 ```
 
-Development, integration, Continuous Integration, and production deployment are implemented and verified. Clifton's final application integration remains to be completed.
+Development, integration and Continuous Integration are implemented for all three applications. Redeploy the final revision and run the documented production smoke checks so the submitted Cloud Run URL reflects the latest Clifton single + batch implementation.

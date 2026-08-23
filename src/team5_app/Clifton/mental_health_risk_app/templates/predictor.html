@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Single Prediction · Clifton{% endblock %}
+
+{% block content %}
+<section class="hero hero-single">
+    <div>
+        <span class="eyebrow">Mental-health risk classification</span>
+        <h1>Turn nine signals into one <em>clear risk estimate.</em></h1>
+        <p class="hero-copy">A focused interface built around the strongest predictors selected during Clifton's exploratory analysis.</p>
+        <div class="hero-pills">
+            <span>{{ feature_count }} model inputs</span>
+            <span>3 risk classes</span>
+            <span>PyCaret pipeline</span>
+        </div>
+    </div>
+    <aside class="model-card {% if model_status.ready %}ready{% endif %}">
+        <span class="pulse"></span>
+        <div>
+            <small>Deployment status</small>
+            <strong>{{ model_status.label }}</strong>
+            <p>{{ model_status.detail }}</p>
+        </div>
+    </aside>
+</section>
+
+<section class="workspace">
+    <form id="risk-form" class="signal-form" novalidate>
+        <div class="form-heading">
+            <div>
+                <span class="eyebrow">Single profile</span>
+                <h2>Enter current signals</h2>
+            </div>
+            <button type="button" class="text-button" id="reset-button">Reset defaults</button>
+        </div>
+
+        {% for group_name, fields in groups.items() %}
+        <fieldset class="signal-group">
+            <legend>
+                <span>{{ "%02d"|format(loop.index) }}</span>
+                <div>
+                    <strong>{{ group_name }}</strong>
+                    <small>
+                    {% if group_name == 'History' %}Key background indicators used by the model.
+                    {% elif group_name == 'Emotional signals' %}Current self-reported emotional and stress scores.
+                    {% else %}Lifestyle factors that may act as protective signals.
+                    {% endif %}
+                    </small>
+                </div>
+            </legend>
+
+            <div class="field-grid">
+                {% for f in fields %}
+                <label class="field-card" data-field-card="{{ f.name }}">
+                    <span class="field-title">{{ f.label }}</span>
+                    <span class="field-help">{{ f.help }}</span>
+                    {% if f.kind == 'binary' %}
+                    <span class="binary-toggle">
+                        <input type="radio" name="{{ f.name }}" value="0" {% if f.default == 0 %}checked{% endif %}>
+                        <span>No</span>
+                        <input type="radio" name="{{ f.name }}" value="1" {% if f.default == 1 %}checked{% endif %}>
+                        <span>Yes</span>
+                    </span>
+                    {% else %}
+                    <span class="number-wrap">
+                        <input
+                            type="number"
+                            name="{{ f.name }}"
+                            value="{{ f.default }}"
+                            min="{{ f.min }}"
+                            max="{{ f.max }}"
+                            step="{{ f.step }}"
+                            required
+                        >
+                        <span class="range-note">{{ f.min }} — {{ f.max }}</span>
+                    </span>
+                    {% endif %}
+                    <span class="field-error" data-error-for="{{ f.name }}"></span>
+                </label>
+                {% endfor %}
+            </div>
+        </fieldset>
+        {% endfor %}
+
+        <div class="form-actions">
+            <a class="secondary-button" href="{{ url_for('batch_form') }}">Need many rows? Batch predict</a>
+            <button class="primary-button" id="predict-button" type="submit">
+                <span>Run risk prediction</span>
+                <b>→</b>
+            </button>
+        </div>
+    </form>
+
+    <aside class="result-panel" id="result-panel" aria-live="polite">
+        <div class="result-placeholder" id="result-placeholder">
+            <span class="result-orbit"><i></i></span>
+            <span class="eyebrow">Prediction output</span>
+            <h2>Ready when you are.</h2>
+            <p>Complete the profile and run the trained classifier. The result will show the predicted class and model confidence when available.</p>
+        </div>
+
+        <div class="result-content" id="result-content" hidden>
+            <div class="result-topline">
+                <span class="eyebrow">Predicted risk class</span>
+                <span class="confidence-badge" id="confidence-badge">Confidence —</span>
+            </div>
+            <div class="risk-badge" id="risk-badge">—</div>
+            <h2 id="risk-heading">Prediction complete</h2>
+            <p id="risk-description"></p>
+
+            <div class="probability-card" id="probability-card">
+                <div class="prob-row">
+                    <span>Low</span>
+                    <div><i id="prob-low"></i></div>
+                    <strong id="prob-low-value">—</strong>
+                </div>
+                <div class="prob-row">
+                    <span>Moderate</span>
+                    <div><i id="prob-moderate"></i></div>
+                    <strong id="prob-moderate-value">—</strong>
+                </div>
+                <div class="prob-row">
+                    <span>High</span>
+                    <div><i id="prob-high"></i></div>
+                    <strong id="prob-high-value">—</strong>
+                </div>
+            </div>
+
+            <div class="clinical-note">
+                <strong>Important</strong>
+                <p>This is an educational machine-learning estimate and should not be interpreted as medical advice or a diagnosis.</p>
+            </div>
+        </div>
+
+        <div class="result-error" id="result-error" hidden></div>
+    </aside>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/predictor.js') }}"></script>
+{% endblock %}

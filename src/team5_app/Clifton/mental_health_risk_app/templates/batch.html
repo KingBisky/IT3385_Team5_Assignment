@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Batch Prediction · Clifton{% endblock %}
+
+{% block content %}
+<section class="hero batch-hero">
+    <div>
+        <span class="eyebrow">CSV batch workflow</span>
+        <h1>Score a full file, <em>without retyping profiles.</em></h1>
+        <p class="hero-copy">Upload a CSV containing Clifton's nine selected model features. The app validates every row before prediction and returns a downloadable result file.</p>
+    </div>
+    <aside class="model-card {% if model_status.ready %}ready{% endif %}">
+        <span class="pulse"></span>
+        <div>
+            <small>Deployment status</small>
+            <strong>{{ model_status.label }}</strong>
+            <p>{{ model_status.detail }}</p>
+        </div>
+    </aside>
+</section>
+
+<section class="batch-layout">
+    <div class="upload-card">
+        <div class="section-title">
+            <span class="eyebrow">01 · Prepare</span>
+            <h2>Upload prediction CSV</h2>
+            <p>Maximum file size: {{ max_upload_mb }} MB. Extra columns are allowed; the nine required model columns must be present.</p>
+        </div>
+
+        <form id="batch-form" enctype="multipart/form-data">
+            <label class="dropzone" id="dropzone" for="batch-file">
+                <input type="file" id="batch-file" name="file" accept=".csv,text/csv" required>
+                <span class="upload-icon">⇧</span>
+                <strong>Drop a CSV here or click to browse</strong>
+                <small id="file-name">No file selected</small>
+            </label>
+            <div class="upload-actions">
+                <a class="secondary-button" href="{{ url_for('batch_template') }}">Download CSV template</a>
+                <button class="primary-button" id="batch-button" type="submit"><span>Validate & predict</span><b>→</b></button>
+            </div>
+        </form>
+
+        <div class="batch-error" id="batch-error" hidden></div>
+    </div>
+
+    <aside class="schema-card">
+        <span class="eyebrow">02 · Required schema</span>
+        <h2>Nine model columns</h2>
+        <div class="schema-list">
+            {% for f in fields %}
+            <div>
+                <code>{{ f.name }}</code>
+                <span>
+                    {% if f.kind == 'binary' %}0/1 or No/Yes
+                    {% else %}{{ f.min }}–{{ f.max }}{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </aside>
+</section>
+
+<section class="batch-result-section" id="batch-result-section" hidden>
+    <div class="section-title compact">
+        <span class="eyebrow">03 · Results</span>
+        <h2><span id="row-count">0</span> rows predicted</h2>
+        <p>Review the class distribution and preview, then download the complete row-level CSV.</p>
+    </div>
+    <a class="primary-button download-button" id="download-link" href="#"><span>Download full results</span><b>↓</b></a>
+
+    <div class="batch-summary-grid" aria-label="Batch prediction summary">
+        <article data-risk="low"><small>Low</small><strong id="count-low">0</strong><span>predictions</span></article>
+        <article data-risk="moderate"><small>Moderate</small><strong id="count-moderate">0</strong><span>predictions</span></article>
+        <article data-risk="high"><small>High</small><strong id="count-high">0</strong><span>predictions</span></article>
+        <article><small>Mean confidence</small><strong id="mean-confidence">—</strong><span>across rows</span></article>
+    </div>
+
+    <div class="table-shell">
+        <table id="preview-table"></table>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/batch.js') }}"></script>
+{% endblock %}

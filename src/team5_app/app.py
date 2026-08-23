@@ -58,16 +58,16 @@ TEAM_PROJECTS = [
     {
         "name": "Clifton",
         "initials": "CL",
-        "status": "Coming soon",
-        "title": "Machine Learning Project",
+        "status": "Live",
+        "title": "Mental Health Risk Predictor",
         "description": (
-            "Clifton's project can plug into this portal with its own dataset, "
-            "model and prediction workflow while keeping the same team experience."
+            "Classifies mental-health risk as Low, Moderate or High using nine "
+            "EDA-selected signals, with both single-profile and batch CSV workflows."
         ),
-        "dataset": "Independent dataset supported",
-        "capabilities": ["Own dataset", "Own model", "Shared portal"],
+        "dataset": "Mental health risk dataset",
+        "capabilities": ["Single prediction", "Batch CSV", "9 model inputs"],
         "href": "/clifton/",
-        "active": False,
+        "active": True,
     },
     {
         "name": "Long Chen",
@@ -90,20 +90,6 @@ TEAM_PROJECTS = [
 def home():
     """Render the shared landing page for all team projects."""
     return render_template("index.html", members=TEAM_PROJECTS)
-
-
-@portal.route("/clifton/")
-def clifton_placeholder():
-    """Temporary integrated page until Clifton's Flask app is added."""
-    return render_template(
-        "placeholder.html",
-        member_name="Clifton",
-        initials="CL",
-        message=(
-            "This route is ready for Clifton's model and dataset. Once his app is "
-            "added, it can be mounted here without changing the rest of the portal."
-        ),
-    )
 
 
 def load_flask_module(module_name: str, app_file: Path):
@@ -139,6 +125,18 @@ def build_application(cfg: DictConfig):
         batch_preview_rows=cfg.app.batch.preview_rows,
     )
 
+    clifton_module = load_flask_module(
+        "clifton_mental_health_risk",
+        ROOT / "Clifton" / "mental_health_risk_app" / "app.py",
+    )
+
+    clifton_module.configure_runtime(
+        max_upload_mb=cfg.app.max_upload_mb,
+        batch_result_ttl_seconds=cfg.app.batch.result_ttl_seconds,
+        batch_chunk_size=cfg.app.batch.chunk_size,
+        batch_preview_rows=cfg.app.batch.preview_rows,
+    )
+
     long_chen_module = load_flask_module(
         "long_chen_salary_predictor",
         ROOT / "Long Chen" / "salary_predictor_app" / "app.py",
@@ -148,6 +146,7 @@ def build_application(cfg: DictConfig):
         portal,
         {
             "/kang-bin": kang_bin_module.app,
+            "/clifton": clifton_module.app,
             "/long-chen": long_chen_module.app,
         },
     )
