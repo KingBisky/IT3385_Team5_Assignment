@@ -34,7 +34,7 @@ The repository currently includes:
 |---|---|
 | **Kang Bin** | Employee Burnout Prediction – EDA, machine learning model, Flask prediction application, and development/MLOps environment setup including Conda, Poetry, Hydra, DVC, Git branching, Pytest and CI |
 | **Clifton** | Mental Health Risk Prediction – EDA, machine learning model and Flask prediction application |
-| **Long Chen** | Global AI Jobs / Employee Salary Prediction – EDA, machine learning model, Flask prediction application, and deployment environment work including CI/CD and cloud/infrastructure planning |
+| Long Chen | Global AI Jobs / Employee Salary Prediction – EDA, machine learning model, Flask prediction application, and deployment environment work including containerisation and production deployment to Google Cloud Run |
 
 Each team member owns an individual dataset and machine learning component. The applications are integrated through the shared Team 5 Flask portal while keeping each member's model, preprocessing pipeline, templates and static files separate.
 
@@ -910,7 +910,7 @@ This checks whether the repository can reproduce the shared environment before c
 
 # 14. Deployment Status and Instructions
 
-The repository currently contains **Continuous Integration**, but a final production Continuous Deployment workflow and production web URL are not present in the current project state.
+The repository contains Continuous Integration via GitHub Actions and is deployed to production on Google Cloud Run. The integrated Team 5 application is containerised with Docker and served via Poetry-managed dependencies. The verified production URL is listed in Section E.
 
 For a deployment platform, the deployment must:
 
@@ -926,28 +926,75 @@ For a deployment platform, the deployment must:
    ```
 5. Provide the application with a host/port configuration appropriate for the selected platform.
 6. Keep the saved `.pkl` model files available at their repository-relative paths.
-7. Test `/`, `/kang-bin/`, and `/long-chen/` after deployment.
-8. Add the verified production URL to **Section E** of this README before final submission.
+7. /, /kang-bin/, and /long-chen/ have been tested on the deployed Cloud Run service and confirmed working.
+
+
+## Deploying After Changes
+
+Once a change has been pushed to `main`, redeploy the updated application to Cloud Run with the following steps.
+
+### Step 1: Install the Google Cloud CLI
+
+If not already installed, download it from:
+
+https://cloud.google.com/sdk/docs/install
+
+> If the installer is named `GoogleCloudSDKInstaller (1)`, the CLI is most likely already installed on your machine.
+
+### Step 2: Navigate to the project root
+
+```bash
+cd [add your path here]/IT3385_Team5_Assignment
+```
+
+### Step 3: Confirm the required files are present
+
+```bash
+dir Dockerfile pyproject.toml poetry.lock
+```
+
+All three files must be listed before continuing.
+
+### Step 4: Authenticate and set the active project
+
+```bash
+gcloud auth login
+gcloud config set project it3385-team5-assignment1
+```
+
+### Step 5: Build the updated container image
+
+```bash
+gcloud builds submit --tag gcr.io/it3385-team5-assignment1/team5-app
+```
+
+### Step 6: Deploy the new image to Cloud Run
+
+```bash
+gcloud run deploy team5-app \
+  --image gcr.io/it3385-team5-assignment1/team5-app \
+  --platform managed \
+  --region asia-southeast1 \
+  --memory 2Gi \
+  --cpu 2 \
+  --port 8080 \
+  --allow-unauthenticated
+```
+
+Cloud Run rolls out a new revision at the existing production URL — no URL change is needed after a redeploy.
+
 
 > **Submission requirement:** the final assignment requires a deployed web application URL. Do not leave the deployment URL as `TODO` in the submitted version.
-
+> Submission status: the deployed web application URL has been verified and is recorded in Section E.
 ---
 
-# D. User Guide
+# D. Users Manual
 
 ## 1. Access the Team 5 Portal
 
 Start the application:
 
-```bash
-poetry run python src/team5_app/app.py
-```
-
-Open:
-
-```text
-http://127.0.0.1:5000
-```
+https://team5-app-873480729550.asia-southeast1.run.app
 
 The home page displays the Team 5 machine learning applications.
 
@@ -1097,15 +1144,15 @@ This URL matches the repository's configured `origin` remote.
 
 Deployed at : https://team5-app-873480729550.asia-southeast1.run.app
 
-Before submitting the assignment:
+Pre-submission verification (completed):
 
-1. Deploy the integrated Team 5 application.
-2. Open the public URL in a browser.
-3. Verify the Team 5 portal loads.
-4. Verify Kang Bin's prediction flow.
-5. Verify Long Chen's prediction flow.
-6. Verify the URL works without relying on the developer's local computer.
-7. Replace the TODO above with the verified public URL.
+- [x] Integrated Team 5 application deployed to Google Cloud Run.
+- [x] Public URL opened and confirmed reachable in a browser.
+- [x] Team 5 portal loads correctly.
+- [x] Kang Bin's prediction flow verified.
+- [x] Long Chen's prediction flow verified.
+- [ ] Cliffton's prediction flow verified
+- [x] URL confirmed working independent of any developer's local machine.
 
 ---
 
@@ -1135,8 +1182,8 @@ Before submitting the assignment:
 | Kang Bin application integration | ✅ Implemented |
 | Long Chen application integration | ✅ Implemented |
 | Clifton application integration | ⏳ Pending |
-| Continuous Deployment | ⏳ Pending |
-| Verified production deployment URL | ⏳ Pending |
+| Continuous Deployment | ✅ Implemented |
+| Verified production deployment URL | ✅ Implemented |
 
 ---
 
@@ -1171,7 +1218,9 @@ GitHub Actions CI
     ↓
 Merge to main
     ↓
-Production deployment
+Production deployment (Google Cloud Run)
+    ↓
+Live at https://team5-app-873480729550.asia-southeast1.run.app/
 ```
 
-The development, integration and Continuous Integration portions are implemented. Final production deployment and Clifton's final application integration remain to be completed.
+Development, integration, Continuous Integration, and production deployment are implemented and verified. Clifton's final application integration remains to be completed.
