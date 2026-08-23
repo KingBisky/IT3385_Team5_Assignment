@@ -179,14 +179,90 @@ The project requires **Python 3.10**.
 
 ## 2. Clone the Repository
 
-Use `git clone` rather than downloading the repository as a ZIP so that Git history, branches, pulling and pushing continue to work.
+Use `git clone` rather than downloading the repository as a ZIP file.
+
+Cloning the repository keeps the Git history, branches, commits, and allows team members to use normal Git commands such as `git pull`, `git push`, and the Pull Request workflow.
+
+### Step 1: Navigate to the folder where you want to store the project
+
+For example, if you want to store the project on your Desktop, first open Command Prompt, PowerShell, Git Bash, or Anaconda Prompt and navigate to your Desktop:
+
+```bash
+cd Desktop
+```
+
+Your terminal should now be inside a location similar to:
+
+```text
+C:\Users\<USERNAME>\Desktop
+```
+
+> Replace `<USERNAME>` with your own Windows username where applicable.
+
+### Step 2: Clone the Team 5 GitHub repository
+
+Run:
 
 ```bash
 git clone https://github.com/KingBisky/IT3385_Team5_Assignment.git
+```
+
+Git will create a new folder named:
+
+```text
+IT3385_Team5_Assignment
+```
+
+The resulting folder location will be similar to:
+
+```text
+C:\Users\<USERNAME>\Desktop\IT3385_Team5_Assignment
+```
+
+### Step 3: Enter the cloned project folder
+
+Run:
+
+```bash
 cd IT3385_Team5_Assignment
 ```
 
----
+You should now be inside the repository root.
+
+For example:
+
+```text
+C:\Users\<USERNAME>\Desktop\IT3385_Team5_Assignment
+```
+
+### Step 4: Confirm that the repository was cloned successfully
+
+Run:
+
+```bash
+git status
+```
+
+You should see output similar to:
+
+```text
+On branch main
+Your branch is up to date with 'origin/main'.
+```
+
+You can also confirm that the GitHub remote is configured correctly:
+
+```bash
+git remote -v
+```
+
+Expected repository URL:
+
+```text
+https://github.com/KingBisky/IT3385_Team5_Assignment.git
+```
+
+After this, continue with the environment setup steps.
 
 ## 3. Create the Conda Environment
 
