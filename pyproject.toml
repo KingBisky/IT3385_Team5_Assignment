@@ -19,6 +19,7 @@ pandas = "2.1.4"
 numpy = "1.26.4"
 scikit-learn = "1.4.2"
 category-encoders = "2.6.3"
+catboost = "1.2.5"
 
 pathspec = "0.11.2"
 

@@ -15,20 +15,43 @@
 <div id="batch-result" style="margin-top:1.5rem;"></div>
 
 <script>
+const BATCH_URL = window.location.pathname.replace(/\/$/, "");
+
 document.getElementById("batch-form").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const formData = new FormData(e.target);
-  const res = await fetch("/batch/predict", { method: "POST", body: formData });
-  const data = await res.json();
   const out = document.getElementById("batch-result");
-  if (!res.ok) {
-    out.innerHTML = `<p style="color:var(--danger)">${data.error}</p>`;
-    return;
+
+  try {
+    const res = await fetch(`${BATCH_URL}/predict`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      out.innerHTML = `<p style="color:var(--danger)">${data.error || "Batch prediction failed."}</p>`;
+      return;
+    }
+
+    const downloadUrl = `${BATCH_URL}/download/${data.result_id}`;
+
+    out.innerHTML = `
+      <p>${data.row_count} rows predicted.</p>
+      <a class="button button--primary" href="${downloadUrl}">
+        Download full results
+      </a>
+    `;
+  } catch (err) {
+    out.innerHTML = `
+      <p style="color:var(--danger)">
+        Could not reach the batch prediction server.
+      </p>
+    `;
+    console.error(err);
   }
-  out.innerHTML = `
-    <p>${data.row_count} rows predicted.</p>
-    <a class="button button--primary" href="${data.download_url}">Download full results</a>
-  `;
 });
 </script>
 {% endblock %}
