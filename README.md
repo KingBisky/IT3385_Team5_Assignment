@@ -985,7 +985,6 @@ Cloud Run rolls out a new revision at the existing production URL — no URL cha
 
 
 > **Submission requirement:** the final assignment requires a deployed web application URL. Do not leave the deployment URL as `TODO` in the submitted version.
-> Submission status: the deployed web application URL has been verified and is recorded in Section E.
 ---
 
 # D. Users Manual
