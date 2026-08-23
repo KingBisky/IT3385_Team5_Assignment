@@ -22,7 +22,7 @@ The repository currently includes:
 
 > **Important:** Python dependency installation for the shared Team 5 project is controlled by **Poetry**.  
 > `pyproject.toml` declares the project dependencies and `poetry.lock` records the exact resolved environment.  
-> Do not use the individual application `requirements.txt` files to build the shared Team 5 environment.
+> The project does not use separate `requirements.txt` files. All Python dependencies are managed centrally using Poetry through `pyproject.toml` and `poetry.lock`.
 
 ---
 
@@ -477,7 +477,7 @@ poetry check
 - Do not run `poetry update` casually; it may upgrade many resolved packages.
 - Do not upgrade PyCaret, scikit-learn, LightGBM, CatBoost, NumPy, pandas or encoders without retesting the saved models.
 - Do not commit only `pyproject.toml` while forgetting `poetry.lock`.
-- Do not use the component `requirements.txt` files as the shared project's installation procedure.
+- Do not create separate component-level `requirements.txt` files; dependency management is centralised through Poetry.
 
 ---
 
