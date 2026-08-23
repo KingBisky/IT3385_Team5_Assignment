@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.git
+.venv
+.dvc/cache
+mlruns/
+outputs/
+notebooks/
+docs/
+tests/
+*.ipynb
