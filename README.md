@@ -326,49 +326,60 @@ TEAM 5 ENVIRONMENT OK
 ---
 # 7. Dependency Management with Poetry
 
-## Add a new dependency
-```bash
-poetry add <package>
-```
+Poetry is the **primary tool** for managing Python dependencies in the Team 5 project.
 
-Example:
+| File | Purpose |
+|------|---------|
+| `pyproject.toml` | Declares project dependencies |
+| `poetry.lock` | Locks exact resolved versions for consistency |
+
+**Rules:**
+- ✅ Use `poetry add/remove/update`
+- ❌ Don't manually install with `pip` as a replacement
+- ❌ Don't manually edit `poetry.lock`
+- ✅ Always commit both `pyproject.toml` and `poetry.lock`
+- ✅ Run tests after changing dependencies
+- ✅ Pull latest `main` before making dependency changes
+
+---
+
+**Common Commands:**
+
+| Action | Command |
+|--------|---------|
+| Add dependency | `poetry add <package>` |
+| Add specific version | `poetry add <package>@1.2.5` |
+| Add dev dependency | `poetry add --group dev <package>` |
+| Remove dependency | `poetry remove <package>` |
+| Update single | `poetry update <package>` |
+| Update all | `poetry update` |
+| Install from lock | `poetry install --no-root` |
+
+**Workflow**
+```bash
+# 1. Add/remove/update a dependency
 poetry add catboost
 
-## Add a specific version
-```bash
-poetry add catboost@1.2.5
-```
-
-## Add a development dependency
-```bash
-poetry add --group dev pytest
-```
-
-## Update dependencies
-```bash
-poetry update
-```
-
-## Update one dependency
-```bash
-poetry update <package>
-```
-
-## Remove a dependency
-```bash
-poetry remove <package>
-```
-
-## Verify the environment
-```bash
+# 2. Reinstall environment from updated lock file
 poetry install --no-root
+
+# 3. Run tests to verify compatibility
 poetry run pytest tests -v
+
+# 4. Test the application locally
+poetry run python src/team5_app/app.py
+
+# 5. Review changes
+git diff pyproject.toml poetry.lock
+
+# 6. Commit both files
+git add pyproject.toml poetry.lock
+git commit -m "Add CatBoost dependency"
+
+# 7. Push to feature branch
+git push
 ```
 
-## Check dependency changes
-```bash
-git diff pyproject.toml poetry.lock
-```
 ---
 
 # 8. Run Automated Tests
