@@ -1252,4 +1252,4 @@ Production deployment (Google Cloud Run)
 Live at https://team5-app-873480729550.asia-southeast1.run.app/
 ```
 
-Development, integration and Continuous Integration are implemented for all three applications. Redeploy the final revision and run the documented production smoke checks so the submitted Cloud Run URL reflects the latest Clifton single + batch implementation.
+Development, integration and Continuous Integration are implemented for all three applications.
